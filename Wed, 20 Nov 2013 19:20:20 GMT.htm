@@ -1,0 +1,62 @@
+<p style="text-align: center;"><strong>Миграция между доменами с помощью ADMT</strong></p>
+<p style="text-align: justify;">Данная пошаговая наглядная статья описывает миграцию пользователей и их паролей, а так же компьютеров между доменами с помощью инструмента <a target="_blank" rel="noopener" href="http://technet.microsoft.com/en-us/library/cc974332.aspx"><strong>Active Directory Migration Tool</strong></a>. Для выполнения миграции через ADMT&nbsp;необходимо выполнить следующие условия:<br>- <a target="_blank" rel="noopener" href="#!Статьи/Windows_Server/Active_Directory/Доверительные_отношения_между_2008_R2_и_2012">доверительные отношения</a>&nbsp;между доменами<br>- отключение фильтрации SID, если пользователю необходим доступ к ресурсам без изменений<br>- учётная запись, под который выполняется миграция, должна быть членом группы Administrators в исходном домене<br>-&nbsp;<span>учётная запись, под который выполняется миграция, должна быть членом локальной группы Administrators в каждом компьютере</span><br>- для установки ADMT v3.2 необходимо установить MS SQL Express<br>- для миграции паролей на контроллере исходного домена устанавливается утилита&nbsp;<a target="_blank" rel="noopener" href="https://connect.microsoft.com/site1164/program8540">PES</a><br>- во время миграции компьютера на нём не должно быть активных сессий</p>
+<p style="text-align: justify;">Тестовый стенд реализован на следующем железе. Все образы дисков хранятся на Storage Spaces из 4 HDD:</p>
+<p><img alt="" src="http://fs.exonix.ru/2012R2/admt/admt0.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Тестовая сеть.<br>Исходный домен:<br>DC01.OLD.EXONIX.RU &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-&nbsp;192.168.0.10<br>CLI01 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;- 192.168.0.11<br>Домен назначения:<br>DC03.<strong>NEW</strong>.EXONIX.MOSCOW &nbsp;- 172.30.130.10<br>ADMT.<span><strong>NEW</strong>.EXONIX.MOSCOW -&nbsp;</span>172.30.130.11<br>DC02.<strong>MAIN</strong><span>.EXONIX.MOSCOW</span>&nbsp;- 10.10.11.10&nbsp;- используется только как родительский домен в лесу.<br><a href="#!Статьи/Сети/Маршрутизатор_2012_R2">Маршрутизация сетей</a><br>ROUTER &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;- все сети</p>
+<p style="text-align: justify;">Новый домен с имеющемся лесу создаётся при выборе следующей опции:</p>
+<p><img height="318" width="700" alt="admt2.2.png" src="1665513729650.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Результат настройки доверий между лесами должен выглядеть следующим образом:&nbsp;</p>
+<p><img height="570" width="824" alt="admt1.png" src="1665513729652.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Для работы ADMT 3.2 необходимо установить бесплатный SQL Express. В моей статье я буду использовать <a target="_blank" rel="noopener" href="http://www.microsoft.com/en-US/download/details.aspx?id=29062">MS SQL 2012 Express</a>, который устанавливается почти с настройками по умолчанию.</p>
+<p><img height="640" width="820" alt="admt2.1.png" src="1665513729654.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Установка ADMT:</p>
+<p><img height="531" width="1024" alt="admt2.png" src="1665513729656.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Проверка членства администратора целевого домена в группе Administrators исходного домена:</p>
+<p><img height="585" width="409" alt="admt4.png" src="1665513729658.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Отключение фильтрации SID в доменах, а так же создание ключа для установки PES.</p>
+<p><img height="475" width="667" alt="admt5.png" src="1665513729660.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Установка PES на контроллере исходного домена запускается из командной строки, запущенной с правами Администратора, в противном случае пароль для ключа не будет приниматься.</p>
+<p><img height="573" width="774" alt="admt6.png" src="1665513729664.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="570" width="959" alt="admt7.png" src="1665513729662.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>После установки PES необходимо перезагрузить сервер и в службах вручную включить службу PES.</p>
+<p><img height="571" width="870" alt="admt8.1.png" src="1665513729668.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="637" width="555" alt="admt8.2.png" src="1665513729666.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>В исходном домене создаются соответствующая NetBios имени группа с областью действия "Доменно локальная" как показано ниже:</p>
+<p><img height="575" width="545" alt="admt8.png" src="1665513729670.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Приступаем к тестовой миграции группы old$$$. Для миграции SID необходимо включить Audit Account Management в обоих доменах. Это можно сделать вручную через локальные политики контроллера домена, который будет указываться во время миграции&nbsp;(или групповые для OU Domain Controllers если таковых несколько, и будет указываться автовыбор контроллера домена) или ADMT это сделает сам как будет показано&nbsp;ниже:</p>
+<p><img height="537" width="723" alt="admt9.png" src="1665513729672.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Записываем имена доменов и выбираем контроллеры доменов. Выбор контроллера для исходного домена обязателен, если в домене их больше одного, а PES установлен только на одном из них.</p>
+<p><img height="527" width="1026" alt="admt10.png" src="1665513729674.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Выбираем ранее созданную группу и указываем путь в AD куда мигрировать.</p>
+<p><img height="527" width="1024" alt="admt11.png" src="1665513729676.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;ADMT предлагает включить Аудит на указанных контроллерах домена в каждом домене:</p>
+<p><img height="556" width="990" alt="admt12.png" src="1665513729678.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Выбираем опции при разрешении конфликтов:</p>
+<p><img height="527" width="1024" alt="admt14.png" src="1665513729680.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>После миграции смотрим логи на предмет миграции SID.</p>
+<p><img height="545" width="1024" alt="admt15.png" src="1665513729682.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Так же SID можно увидеть в атрибуте sIDHistory. В Событиях можно посмотреть сообщение 4765:</p>
+<p><img height="729" width="1019" alt="admt16.png" src="1665513729684.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Приступаем к миграции пользователя выбрав соответствующую задачу в ADMT. При первом переносе учётной записи пользователя его пароль не мигрируется, даже если указать соответствующую опцию.</p>
+<p><img height="503" width="888" alt="admt17.png" src="1665513729692.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="506" width="1024" alt="admt18.png" src="1665513729686.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Во время миграции пользователя можно задать миграцию и всех групп, в которые он входит. В моём случае, пользователь входит в одну группу:</p>
+<p><img height="504" width="1024" alt="admt19.png" src="1665513729690.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="527" width="1024" alt="admt13.png" src="1665513729688.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span>Проверяем логи на предмет ошибок. В логах отображено сообщение о том, что пароль не был скопирован, а его, как я понял, хешь записан в текстовый файл, который можно открыть блокнотом запущенным от имени администратора.</span></p>
+<p><img height="622" width="1024" alt="admt20.png" src="1665513729694.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>При повторной миграции пользователя скопируется его пароль, а так же будет установлен атрибут - <strong>смена пароля при первом входе</strong>.</p>
+<p><img height="728" width="1024" alt="admt21.png" src="1665513729696.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Приступаем к миграции компьютера, выбрав соответствующее действие и <a target="_blank" rel="noopener" href="https://technet.microsoft.com/en-us/library/cc974402(v=ws.10).aspx">опции</a>.&nbsp;Рекомендую перед переносом реального пользовательского компьютера протестировать миграцию его клона в тестовой среде, и проверить работоспособность пользовательских приложений, которые используют сертификаты. Например, клиент-банки.</p>
+<p><img height="451" width="888" alt="admt22.png" src="1665513729704.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="502" width="1024" alt="admt23.png" src="1665513729702.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="501" width="1024" alt="admt24.png" src="1665513729700.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="688" width="547" alt="admt26.png" src="1665513729698.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Миграция компьютера в другой домен завершена. Пользователь может залогинится на своём компьютере в новом домене.<br>Для того, чтобы отключить Аудит, включённый ADMT, необходимо открыть оснастку локальных политик контроллера домена:</p>
+<p><img height="768" width="1024" alt="admt28.png" src="1665513729706.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Во время переноса может возникнуть ошибка подключения к компьютеру. Это связанно с фаерволом, в котором необходимо включить все правила File Sharing:</p>
+<p><img height="554" width="1024" alt="admt27.png" src="1665513729708.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Если возникнет ошибка:&nbsp;<em>ERR2:7674 Unable to determine the local path for ADMIN share on the machine 'CLI01'. rc=-2147024891</em>&nbsp;- это означает, что нет административных прав на данный компьютер для учётной записи, которая выполняет миграцию. Решается добавлением этой учётной записи в локальную группу Администраторы с помощью групповых политик&nbsp;Restricted Groups.</p>
+<p style="text-align: right;"><em>19.04.2015</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

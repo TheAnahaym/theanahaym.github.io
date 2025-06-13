@@ -1,0 +1,40 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Сети.Маршрутизатор_2012_R2">Маршрутизатор 2012 R2</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Сети.Локальная_сеть_IPv4">Локальная сеть IPv4</a></li>
+<li><a href="#!Статьи.Сети.Маршрутизация_сетей_IPv4">Маршрутизация сетей IPv4</a></li>
+<li><a href="#!Статьи.Сети.Настройка_маршрутизации_сетей_Windows_и_Linux">Настройка маршрутизации сетей Windows и Linux</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;</p>
+<p style="text-align: justify;">Статья описывает настройку маршрутизатора в операционной системе Windows Server 2012 R2 <strong>встроенными средствами&nbsp;</strong>- ролью "Удалённый Доступ" (Remote Access). Данная конфигурация будет использована в других статьях для предоставления интернета виртуальным машинам. Исходная конфигурация сетевых интерфейсов: один внешний WAN и два внутренних LAN-1 и LAN-2.</p>
+<p><img height="768" width="1024" alt="rras1.png" src="1665329145101.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Установка ролей начинается в Server Manager.</p>
+<p><img height="768" width="1024" alt="rras2.png" src="1665329145103.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Выбираем роль Remote Access и все предложенные компонеты по умолчанию.</p>
+<p><img height="768" width="1024" alt="rras3.png" src="1665329145105.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="rras4.png" src="1665329145107.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Установку ролей и компонентов можно проводить и через PowerShell указав <a target="_blank" rel="noopener" href="http://fs.exonix.ru/2012R2/rras.xml">файл кофигурации</a>. В нём обходимо заменить имя сервера RRAS12R2 на имя вашего сервера.</p>
+<p><img height="768" width="1024" alt="rras5.png" src="1665329145109.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;После установки в Server Manager в задачах выбираем настройку Remote Access. Выбираем Deploy VPN only.</p>
+<p><img height="768" width="1024" alt="rras6.png" src="1665329145111.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;В открывшейся оснастке Routing and Remote Access настраиваем службу RRAS.</p>
+<p><img height="768" width="1024" alt="rras7.png" src="1665329145113.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Выбираем конфигурацию "на заказ" (не люблю слово "кастомизация"), далее NAT для предоставления интернета внутренним интерфейсам и LAN routing для маршрутизации между интерфейсами.</p>
+<p><img height="768" width="1024" alt="rras8.png" src="1665329145115.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="rras9.png" src="1665329145117.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="rras10.png" src="1665329145119.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Определяем публичный NAT-интерфейс и частные интерфейсы.</p>
+<p><img height="768" width="1024" alt="rras11.png" src="1665329145121.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="rras12.png" src="1665329145123.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="rras13.png" src="1665329145125.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="ad14.png" src="1665329145127.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;На этом настройка маршрутизатора на операционной системе Windows Server 2012 R2 завершена.</p>
+<p><img height="768" width="1024" alt="rras15.png" src="1665329145129.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: right;"><em>16.11.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

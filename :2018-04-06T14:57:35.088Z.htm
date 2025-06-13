@@ -1,0 +1,79 @@
+<p style="text-align: center;"><span style="font-size: 14pt;"><strong>Failover Cluster (миграция с Windows Server 2012 R2 в Windows Server 2016 Cluster)</strong></span></p>
+<p style="text-align: center;"><em>Сетевое хранилище организовано на отельном Linix-Сервере</em></p>
+<p><em><strong>Исходные данные</strong>:</em><br>1) "сервер" <strong>H-1</strong>.Hyper-v.test<br>Intel NUC 7i5BNK (Intel Core <strong>i5-7260U</strong>, 8 GB RAM, Crutial M.2 SSD 256 GB)<br>Windows Server 20<strong>12 R2</strong> с ролью Hyper-V и несколькими виртуальными машинами.<br>10.254.1.73<br>2) "сервер" <strong>H-N-2</strong>.Hyper-v.test<br>Intel NUC 6i3SYK (Intel Core <strong>i3-6100U</strong>, 8 GB RAM,&nbsp;Crutial M.2 SSD 256 GB)<br>Windows Server 20<strong>16</strong> с ролью Hyper-V<br>10.254.1.55<br>3) "сервер" <strong>H-N-3.</strong>Hyper-v.test<br>Intel NUC 6i5SYK (Intel Core <strong>i5-6260U</strong>, 8 GB RAM,&nbsp;Crutial M.2 SSD 256 GB)<br>Windows Server 20<strong>16</strong> с ролью Hyper-V<br>10.254.1.55<br>4) сервер <strong>iscsi2</strong>.Hyper-V.test<br>виртуальная машина (<strong>Intel Core i7-6700</strong>, 4 GB RAM, 128 GB VHDX)<br><span style="color: #ff0000;"><strong>Debian</strong></span> <strong>9.4 x64</strong><br>10.254.1.97<br>iSCSI-цель настраивается с помощью&nbsp;tgtadm. Общий <a href="/Статьи/Unix-Linux/iSCSI/">пример настройки</a>. В данной статье будут написаны точные команды для нашей задачи.</p>
+<p><em><strong>Задача</strong>:</em> переместить виртуальные машины с Windows 20<strong>12 R2</strong> в Кластер на Windows Server 20<strong>16</strong> с общим сетевым хранилищем.</p>
+<p><strong><em>Решение</em></strong>:<br><span style="color: #0000ff;"><strong>1</strong></span>) Установка Failover Cluster на серверах Windows Server 20<strong>16</strong>:</p>
+<pre>Add-WindowsFeature –Name Failover-clustering –IncludeManagementTools</pre>
+<p><span style="color: #0000ff;"><strong>2</strong></span>) Создание <a target="_blank" rel="noopener" href="https://www.thomas-krenn.com/en/wiki/Simple_Samba_Shares_in_Debian">общей папки на сервере Debian 9.4</a> для диска-свидетеля (<strong>папка для всех, без ограничения по размеру, что небезопасно</strong>):</p>
+<pre>aptitude install samba<br>echo "[public]" &gt;&gt; /etc/samba/smb.conf<br>echo "path = /media/storage/" &gt;&gt; /etc/samba/smb.conf<br>echo "public = yes" &gt;&gt; /etc/samba/smb.conf<br>echo "writable = yes" &gt;&gt; /etc/samba/smb.conf<br>echo "comment = smb share" &gt;&gt; /etc/samba/smb.conf<br>echo "printable = no" &gt;&gt; /etc/samba/smb.conf<br>echo "guest ok = yes" &gt;&gt; /etc/samba/smb.conf<br>mkdir /media/storage/<br>/etc/init.d/samba restart</pre>
+<p><span style="color: #0000ff;"><strong>3</strong></span>) Создание кластера. Для данного тестового кластера будет использоваться <span style="color: #ff0000;"><strong>только одна сеть</strong></span>, поэтому <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/azure/storsimple/storsimple-8000-configure-mpio-windows-server">MPIO</a> не будет использоваться.</p>
+<pre>Test-Cluster -Node h-n-2, h-n-3<br>New-Cluster -Name CLST1 -node h-n-2, h-n-3 -StaticAddress 10.254.1.249<br>Set-ClusterQuorum -FileShareWitness \\10.254.1.97\public</pre>
+<p><img height="807" width="910" alt="clst1.png" src="1665845879377.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span style="color: #0000ff;"><strong>4</strong></span>) Создание и подключение общего сетевого хранилища к обоим нодам кластера и инициализация диска:</p>
+<p>&nbsp;В <strong>Linux:</strong></p>
+<pre>dd if=/dev/zero of=/iscsi/iscsi-disk1 bs=1M count=32000<br>tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2018-04.<strong>csv</strong>.domain.com<br>tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 1 -b /iscsi/iscsi-disk1<br>tgtadm --lld iscsi --mode target --op bind --tid 1 -I 10.254.1.82<br>tgtadm --lld iscsi --mode target --op bind --tid 1 -I 10.254.1.55<br>tgtadm --lld iscsi --mode target --op bind --tid 1 -I 10.254.1.249</pre>
+<pre>tgtadm --lld iscsi --mode target --op show
+<strong>Target 1: iqn.2018-04.csv.domain.com</strong>
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            SWP: No
+            Thin-provisioning: No
+            Backing store type: null
+            Backing store path: None
+            Backing store flags:
+        LUN: 1
+            Type: disk
+            SCSI ID: IET     00010001
+            SCSI SN: beaf11
+            <strong>Size: 33554 MB, Block size: 512</strong>
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            SWP: No
+            Thin-provisioning: No
+            Backing store type: rdwr
+            Backing store path: /iscsi/iscsi-disk1
+            Backing store flags:
+    Account information:
+    <strong>ACL information:
+        10.254.1.82
+        10.254.1.55
+        10.254.1.249
+</strong></pre>
+<p>&nbsp;В <strong>Windows Server</strong>:</p>
+<pre>New-IscsiTargetPortal -TargetPortalAddress "10.254.1.97"<br>Get-IscsiTarget -NodeAddress iqn.2018-04.<strong>csv</strong>.domain.com | Connect-IscsiTarget -IsPersistent $true<br>get-disk | where {$_.OperationalStatus -eq "Offline"} | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "csv" -Confirm:$false</pre>
+<p>&nbsp;Для второй ноды. Можно запускать всю команду с первой ноды или только команду в фигурных скобках <span style="color: #0000ff;"><strong>{ }</strong></span> непосредественно на второй ноде:</p>
+<pre>Invoke-Command -Computername <strong>h-n-3</strong> -ScriptBlock <strong><span style="color: #0000ff;">{</span></strong>New-IscsiTargetPortal -TargetPortalAddress "10.254.1.97"<span style="color: #0000ff;"><strong>}</strong></span><br>Invoke-Command -Computername <strong>h-n-3</strong> -ScriptBlock <span style="color: #0000ff;"><strong>{</strong></span>Get-IscsiTarget -NodeAddress iqn.2018-04.<strong>csv</strong>.domain.com | Connect-IscsiTarget -IsPersistent $true<span style="color: #0000ff;"><strong>}</strong></span><br>Invoke-Command -Computername <strong>h-n-3</strong> -ScriptBlock <span style="color: #0000ff;"><strong>{</strong></span>get-disk | where {$_.BusType -eq "iSCSI"} | Set-Disk -IsOffline $False<span style="color: #0000ff;"><strong>}</strong></span></pre>
+<p><span style="color: #0000ff;"><strong>5</strong></span>) Подключение общего ресурса к кластеру:</p>
+<pre>Get-ClusterAvailableDisk | Add-ClusterDisk | Add-ClusterSharedVolume</pre>
+<p><img height="586" width="1160" alt="clst2.png" src="1665845879379.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span style="color: #0000ff;"><strong>6</strong></span>) Подготовка Нyper-V ролей на нодах на использование подключённого общего сетевого хранилища:</p>
+<pre>Set-VMHost -VirtualHardDiskPath "C:\ClusterStorage\Volume1\Hyper-V\Virtual Hard Disks\" -VirtualMachinePath "C:\ClusterStorage\Volume1\Hyper-V\"<br>Invoke-Command -Computername <strong>h-n-3</strong> -ScriptBlock <span style="color: #0000ff;"><strong>{</strong></span>Set-VMHost -VirtualHardDiskPath "C:\ClusterStorage\Volume1\Hyper-V\Virtual Hard Disks\" -VirtualMachinePath "C:\ClusterStorage\Volume1\Hyper-V\"<span style="color: #0000ff;"><strong>}</strong></span></pre>
+<p><span style="color: #3366ff;"><strong>7</strong></span>) Включение совместимости процессоров в виртуальной машине, но у меня виртуальная машина переместилась и без включённой совместимости процессоров.</p>
+<pre>get-vm -name <strong>test_2016</strong> | Set-VMProcessor -CompatibilityForMigrationEnabled 1</pre>
+<p><img height="694" width="736" alt="clst3.png" src="1665845879381.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><strong><span style="color: #3366ff;">8</span></strong>) Перемещение виртуальной машины на одну из нод кластера (<strong>имена виртуальных свитчей должны совпадать при переносе через PowerShell</strong>)</p>
+<pre>Move-VM "<em><strong>test_2016</strong></em>" h-n-2 -IncludeStorage -DestinationStoragePath "C:\ClusterStorage\Volume1\Hyper-V\Virtual Hard Disks\"</pre>
+<p><span style="color: #3366ff;"><strong>9</strong></span>) Добавление виртуальной машины в кластер:</p>
+<pre>Add-ClusterVirtualMachineRole -VirtualMachine <em><strong>test_2016</strong></em></pre>
+<p><span style="color: #3366ff;"><strong>10</strong></span>) Тестирование отказоустойчивости:</p>
+<pre>Move-ClusterVirtualMachineRole -Name "test_2016" -Node h-n-3</pre>
+<p>&nbsp;Или просто выключаем первую ноду и смотрим поведение кластера.</p>
+<p style="text-align: right;"><em>19.04.2018</em></p>
+<div id="vk_comments">&nbsp;</div>
+<div id="fb-root">&nbsp;</div>
+<p>&nbsp;</p>
+<div data-href="http://exonix.ru/#!Статьи/Windows_Server/Hyper-V/Failover_Cluster/" data-width="670" data-numposts="20" class="fb-comments">&nbsp;</div>

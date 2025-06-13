@@ -1,0 +1,47 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.DHCP.2012_R2">DHCP 2012 R2</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server.DHCP">Windows DHCP Server</a></li>
+<li><a href="#!Статьи.Windows_Server.DHCP.2008_R2">DHCP 2008 R2</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;В данной статье будет рассмотрена установка и настройка DHCP 2012 R2, а так же рассмотрены некоторые изменения по сравнению с предыдущим <a href="#!Статьи.Windows_Server.DHCP.2008_R2">DHCP 2008 R2</a>. С выходом Windows Server 2012 установка ролей и компонентов выполняется одним мастером из Server Manager. Для установки DHCP роли я решил воспользоваться более быстрым способом - PowerShell:</p>
+<p><img height="768" width="1024" alt="dh0.png" src="1665845879271.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Команда на установку роли DHCP и инструмента управления ролью. Если не устанавливать инструменты управления, то настраивать и управлять DHCP ролью можно из командной строки с помощью <a target="_blank" rel="noopener" href="http://technet.microsoft.com/en-us/library/jj590751.aspx">PowerShell</a>&nbsp;или команды&nbsp;<a target="_blank" rel="noopener" href="http://technet.microsoft.com/en-us/library/bb490941.aspx">netsh</a>.</p>
+<p><em>Add-WindowsFeature -IncludeManagementTools dhcp</em></p>
+<p><img height="280" width="1024" alt="dh1.png" src="1665845879275.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;После установки необходимо настроить роль. Для этого необходимо открыть оснастку DHCP и сделать это можно четырьмя способами.<br>&nbsp;<strong>1</strong>) сразу после установки роли</p>
+<p><img height="768" width="1024" alt="dh2.png" src="1665845879277.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><strong>2</strong>) Из менеджера сервера - инструменты - DHCP<br><strong>3</strong>)&nbsp;Из менеджера сервера - меню слева DHCP - DHCP Manager</p>
+<p><img height="768" width="1024" alt="dh3.png" src="1665845879279.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><strong>4</strong>) Воспользоваться поиском на Стартовом Окне (бывшее меню Пуск).<br>Лично я предпочитаю использовать последний вариант запуска любых приложений Windows 8.1\Server 2012 R2</p>
+<p><img height="768" width="1024" alt="dh4.png" src="1665845879281.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Правый клик на IPv4 - новая область (New Scope...)</p>
+<p><img height="768" width="1024" alt="dh5.png" src="1665845879283.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Указываем имя области, например, NetworkID.</p>
+<p><img height="768" width="1024" alt="dh6.png" src="1665845879285.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Задаём ранг выдаваемых IP адресов и маску сети:</p>
+<p><img height="768" width="1024" alt="dh7.png" src="1665845879287.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Если в ранге есть адреса, которые нужно исключить из раздачи, задаём их в исключениях. Так же здесь задаётся время задержки Delay. Delay нужен для того, что бы клиенты получали адреса от сервера с наименьшем времени задержки. Например, если необходимо чтобы <strong>один</strong> DHCP сервер выдавал адреса до тех пор пока они у него не закончатся, то <strong>второму</strong> серверу назначается время задержки.</p>
+<p><img height="768" width="1024" alt="dh8.png" src="1665845879289.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Далее задаётся время аренды. Я выставляю 5 дней - рабочая неделя.</p>
+<p><img height="768" width="1024" alt="dh9.png" src="1665845879291.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Далее необходимо настроить опции области. Мастер предложит лишь несколько минимально необходимых опций. Если на сервере несколько областей, то для каждой можно настроить свои олции. Так же можно настроить опции на уровне сервера, которые будут применятся на все области DHCP сервера.</p>
+<p><img height="768" width="1024" alt="dh10.png" src="1665845879293.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Адрес шлюза в интернет, он же шлюз по умолчанию.</p>
+<p><img height="768" width="1024" alt="dh11.png" src="1665845879295.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;ДНС сервера. Для доменной сети это как правило адреса контроллера домена или отдельных ДНС, которым делегирована интегрированная в AD ДНС-зона. Например, bind установленный на Linux\Unix умеет работать с такой зоной. Так же задаётся&nbsp;главный&nbsp;ДНС-суффикс для доменной сети.</p>
+<p><img height="768" width="1024" alt="dh12.png" src="1665845879297.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Активируем DHCP-область и на этом настройка DHCP завершена.</p>
+<p><img height="768" width="1024" alt="dh13.png" src="1665845879301.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="dh14.png" src="1665845879303.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Проверяем работу DHCP сервера, подключив в сеть DHCP-клиента и проверив, что он получил адрес из настроенной области. Обратите внимание на DHCPv6 IAID и DHCPv6 Client DUID - по ним назначается резервирование IPv6 адресов.</p>
+<p><img height="768" width="1024" alt="dh15.png" src="1665845879305.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: right;"><em>18.04.2014</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

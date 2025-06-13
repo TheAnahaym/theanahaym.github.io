@@ -1,0 +1,85 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.DNS">DNS</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.DNS.Управление_доменной_зоной">Управление доменной зоной</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;DNS - Domain Name System. Одна из важнейших используемых ролей, отвечающих за сопоставление доменных имён IP адресам. С внедрением IPv6 её значимость ещё значительнее увеличивается. ДНС сервера делятся на кеширующие, перенаправляющие запросы и авторитарные. ДНС сервера, которым делегированы доменные зоны являются авторитарными, в противном случае вы получите &nbsp;Non-authoritative answer от nslookup. Настройка и управление ДНС на самом деле не является сложным делом. Однако, часто на форумах появляются темы о восстановление работы Active Directory, с которой ДНС сильно взаимосвязаны. Причинами некорректной работы Active Directory во многих случаях является "настройка" ДНС.</p>
+<p style="text-align: justify;">&nbsp;Немного истории операционных систем. В Windows Server 2003 необходимо (я рекомендую) выбирать и AD и ДНС. Я не знаю почему, но очень часто администраторы устанавливают сначала ДНС, настраивают и только потом устанавливают AD. Никогда так не поступал, а всегда устанавливал ДНС вместе с AD. У знакомого недавно был случай, когда он решил настроить второй контроллер домена, но по незнанию ДНС устанавливать не стал. Через некоторое время первый (по порядку) контроллер домена сломался, ну и ДНС вмести с ним. Восстановить контроллер домена не удалось. Вот они как-то и работали на втором контроллере домена без ДНС. В итоге пришлось устанавливать новый домен и импортировать пользователей. Не мигрировать, а именно экспортировать и импортировать, так как для миграции нужны доверительные отношения, которым нужен кто? Правильно - ДНС.</p>
+<p style="text-align: justify;">&nbsp;Конечно, бывают случаи когда ДНС нужен без AD, но через некоторое время компания может развернуть инфраструктуру AD. Вот почему важно планировать инфраструктуру с учётом расширения компании. Мне не приходилось работать с такой организацией. Если компании нужен ДНС для работы с сетью Интернет - я рекомендую использовать ДНС сервера предоставляемые провайдером или открытые ДНС Google, например 8.8.8.8. Если у вас есть веб-сайт я рекомендую использовать платные\бесплатные ДНС хостинговой компании. Так надёжнее.</p>
+<p style="text-align: justify;">&nbsp;Начиная с Windows Server 2008 ДНС по умолчанию устанавливается во время настройки AD DS через DCPROMO, и автоматически правильно настраивается. Единственное, что нужно в него будет добавить: <em>это адреса серверов пересылки (адреса ДНС серверов вашего провайдера или Гугла) и Обратную зону</em>. Установку роли ДНС 2012 я покажу на примере отдельной установки без AD, а настройку с AD. Если у вас контроллер домена имеет несколько сетевых интерфейсов, то предварительно рекомендую настроить сетевые интерфейсы в соответствии с <a href="http://support.microsoft.com/kb/272294">данной статьёй</a>. А именно - исключить недоменный интерфейс из регистрации в ДНС. Сетевые настройки самого недоменного интерфейса в этом случае не важны. Но бывают случаи (на моей практике это было один раз) когда и в случае отключённой регистрацией указанные ДНС в свойствах недоменной сетевой карты влияли на работу сервера. Ну и чтобы не было споров нужны там ДНС или нет - я не рекомендую использовать контроллеры домена в качестве маршрутизаторов. Если &nbsp;у вас просто Windows Server 2012 в качестве маршрутизатора, то лично я настраиваю сеть как и на любом "аппаратном" маршрутизаторе, то есть с ДНС во внешнем интерфейсе. Вторая причина моего выбора: в случае отказа доменного ДНС, сам сервер будет использовать внешний ДНС автоматически. Установка начинается в Server Manager:</p>
+<p><img height="768" width="1024" alt="dns1.png" src="1665845879227.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Предупреждение, что у нас не назначен статический IP адрес. Для тестов я позволю себе остаться на динамическом адресе.</p>
+<p><img height="768" width="1024" alt="dns2.png" src="1665845879229.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="dns3.png" src="1665845879231.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;&nbsp;Теперь кратко о настройке.&nbsp;В свойствах сервера ДНС, первая вкладка определяет какие интерфейсы будет обслуживать данный ДНС сервер. По умолчанию выделены все.</p>
+<p><img height="768" width="1024" alt="dns4.png" src="1665845879233.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;<span style="color: #ff0000;"><strong>Forwarders (Адреса пересылки)</strong></span> - здесь указываются вышестоящие ДНС сервера, на которые будет отправлять запросы ваш ДНС сервер, если не обнаружит записи у себя. Как правило это ДНС провайдера или открытые ДНС, например google 8.8.8.8. В примере я указал другой внутренний ДНС сервер.</p>
+<p><img height="768" width="1024" alt="dns5.png" src="1665845879235.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Некоторые опции ДНС сервера. Если у вас кластер из веб-серверов и одно доменное имя имеет несколько IP адресов, то Round Robin позволяет поочередно выдавать разные IP адреса. Вот пример работы Round Robin:</p>
+<blockquote>
+<div>C:\Users\user&gt;nslookup ya.ru</div>
+<div>Server: &nbsp;dc1.domain.local</div>
+<div>Address: &nbsp;192.168.10.10</div>
+<div>&nbsp;</div>
+<div>Non-authoritative answer:</div>
+<div>Name: &nbsp; &nbsp;ya.ru</div>
+<div>Addresses: &nbsp;<span style="color: #ff0000;">87.250.251.3</span></div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">93.158.134.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 93.158.134.203</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 213.180.193.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 213.180.204.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 77.88.21.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 87.250.250.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 87.250.250.203</span></div>
+<div>&nbsp;</div>
+<div>C:\Users\user&gt;ping ya.ru</div>
+<div>&nbsp;</div>
+<div>Pinging ya.ru [93.158.134.<span style="color: #ff0000;"><strong>3</strong></span>] with 32 bytes of data:</div>
+<div>Reply from 93.158.134.3: bytes=32 time=35ms TTL=53</div>
+<div>Reply from 93.158.134.3: bytes=32 time=42ms TTL=249</div>
+<div>Reply from 93.158.134.3: bytes=32 time=48ms TTL=53</div>
+<div>Reply from 93.158.134.3: bytes=32 time=38ms TTL=53</div>
+<div>&nbsp;</div>
+<div>Ping statistics for 93.158.134.3:</div>
+<div>&nbsp; &nbsp; Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),</div>
+<div>Approximate round trip times in milli-seconds:</div>
+<div>&nbsp; &nbsp; Minimum = 35ms, Maximum = 48ms, Average = 40ms</div>
+<div>&nbsp;</div>
+<div>C:\Users\user&gt;ipconfig /flushdns</div>
+<div>&nbsp;</div>
+<div>Windows IP Configuration</div>
+<div>&nbsp;</div>
+<div>Successfully flushed the DNS Resolver Cache.</div>
+<div>&nbsp;</div>
+<div>C:\Users\user&gt;ping ya.ru</div>
+<div>&nbsp;</div>
+<div>Pinging ya.ru [93.158.134.<span style="color: #ff0000;"><strong>203</strong></span>] with 32 bytes of data:</div>
+<div>Reply from 93.158.134.203: bytes=32 time=41ms TTL=249</div>
+<div>Reply from 93.158.134.203: bytes=32 time=43ms TTL=249</div>
+<div>Reply from 93.158.134.203: bytes=32 time=36ms TTL=53</div>
+<div>Reply from 93.158.134.203: bytes=32 time=40ms TTL=53</div>
+<div>&nbsp;</div>
+<div>Ping statistics for 93.158.134.203:</div>
+<div>&nbsp; &nbsp; Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),</div>
+<div>Approximate round trip times in milli-seconds:</div>
+<div>&nbsp; &nbsp; Minimum = 36ms, Maximum = 43ms, Average = 40ms</div>
+</blockquote>
+<p style="text-align: justify;">&nbsp;</p>
+<p><img height="768" width="1024" alt="dns6.png" src="1665845879237.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Root Hints - корневые ДНС сервера. Тоже самое что и сервера пересылке, только надёжность намного выше. Подразумевается, что root hints всегда доступны. Почему-то в ДНС 2012 прописан только один корневой сервер, обычно и там около десятка.</p>
+<p><img height="768" width="1024" alt="dns7.png" src="1665845879239.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;<span style="color: #ff0000;"><strong>Создаём обратную зону</strong></span>. Без неё невозможно будет создать PTR записи. Все пункты по умолчанию. Вписать лишь нужно ID вашей сети. В моём примере обратная зона уже создана.</p>
+<p><img height="768" width="1024" alt="dns8.png" src="1665845879241.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="dns9.png" src="1665845879243.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;На этом базовая настройка завершена. ДНС сервер готов к обслуживанию клиентов.</p>
+<p style="text-align: justify;">&nbsp;Одно замечание по установке. Во время попытки установки AD DS и DNS одновременно на 2008 R2 можно было увидеть следующее сообщение. В Windows Server 2012 можно одновременно выбрать AD DS и DNS роли.</p>
+<p><img height="768" width="1024" alt="dns19.png" src="1665845879245.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: right;"><em>30.04.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

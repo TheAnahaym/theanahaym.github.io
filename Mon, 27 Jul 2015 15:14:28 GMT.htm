@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>&nbsp;Имеется доменная сеть на 2012 R2 за NAT, состоящая из двух серверов - Контроллера домена и Сервера Direct Access. На роутере пробрасывается 443 порт на сервер DA. Установка роли Remote Access и настройка Direct Access:</p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da2.png" height="569" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da3.png" height="692" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da4.png" height="693" width="1024" /></p>
+<p>Указываем публичное имя для доступа к серверу, для которого на марштрутизаторе настроен проброс порта 443</p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da5.png" height="624" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da6.png" height="725" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da7.png" height="663" width="1024" /></p>
+<p>Выбираем группу компьютеров, для которой разрешено подключаться к серверу</p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da8.png" height="544" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da9.png" height="596" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da10.png" height="721" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da11.png" height="720" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da12.png" height="720" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da13.png" height="737" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da14.png" height="731" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da15.png" height="704" width="1024" /></p>
+<p></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/directaccess/da16.png" height="733" width="1024" /></p>
+<p>Создаём конфигурационный файл для офлайнового ввода компьютера в домен. Учётную запись компьютера добавляем в группу для доступа DA:</p>
+<pre>Djoin /provision /domain domain.local /machine BER-LW-0817-02 /policynames "DirectAccess Client Settings" /rootcacerts /savefile c:\provision.txt /reuse</pre>
+<pre><span style="color: #222222; font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: normal; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: pre; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: #f9f9f9; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;">Djoin /requestodj /loadfile C:\provision.txt /windowspath %windir% /localos</span></pre>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/2012R2/directaccess/da17.png" height="345" width="1024" /></p>
+<p>&nbsp;Переносим файл на клиента&nbsp;и вводим его в домен:</p>
+<p style="text-align: center;"><img alt="" src="http://fs.exonix.ru/2012R2/directaccess/da18.png" height="212" width="678" /></p>
+<p style="text-align: justify;">&nbsp;После перезагрузки компьютер подключится к серверу DA и корпоративной сети.</p>
+<p style="text-align: right;"><em>июль 2015</em></p>
+</body>
+</html>

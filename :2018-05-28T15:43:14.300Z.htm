@@ -1,0 +1,6 @@
+<html><head>
+</head><body>
+<div style="text-align: center;"><strong>Just Enough Administration</strong></div>
+<div style="text-align: center;">&nbsp;</div>
+<pre>$Name = (Read-Host "Domain\Username")<br />$Role = (Read-Host "Role")<br />$File = (Read-Host "File name")<br />$Path1 = "C:\Program Files\WindowsPowerShell\$File.pssc"<br />$Path2 = "C:\Program Files\WindowsPowerShell\Modules\JEA\RoleCapabilities\$File.psrc"<br />$RD = @{ $Name = @{ RoleCapabilities = $Role }}<br />$RRS = 'RestrictedRemoteServer'<br />$TDir = 'C:\Transcripts\'<br />New-PSSessionConfigurationFile -Path $Path1 -SessionType $RRS -TranscriptDirectory $TDir -RunAsVirtualAccount:$true -RoleDefinitions $RD<br />$Path1<br />New-PSRoleCapabilityFile -Path $Path2 -VisibleCmdlets 'get-disk','get-volume'<br />$Path2<br />Register-PSSessionConfiguration -Name $Role -Path $Path1</pre>
+</body></html>

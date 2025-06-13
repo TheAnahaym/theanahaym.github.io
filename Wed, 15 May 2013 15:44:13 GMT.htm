@@ -1,0 +1,27 @@
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012.Создание_виртуальной_машины">Создание виртуальной машины</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012">Hyper-V 2012</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;Создание виртуальной машины (ВМ) очень просто. Выбираем меню New и вперёд! )</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/7HV.png" width="718" height="540" alt="" /></p>
+<p>&nbsp;Выбираем название нашей ВМ. Если нужно, можем выбрать место хранения конфигурационных файлов и снимков.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/8HV.png" width="718" height="540" alt="" /></p>
+<p style="text-align: justify;">&nbsp;Выделяем объём для оперативной памяти для ВМ, в соотвествии с требованиями к устанавливаемой ОС. В моём примере 2 GB для Windows 8 вполне достаточно. Для ВМ с Exchange 2010 можно назначить и всю память минус 2 GB для хоста.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/9HV.png" width="718" height="540" alt="" /></p>
+<p style="text-align: justify;">&nbsp;Выбираем тип сетевой карты. Если гостевой ОС будет Linux с ядром меньше 3.4 данный пункт можно пропустить, т.к. по умолчанию назначается сентетическая сетевая карта, с которой ядро до 3.4 не работает без Linux IC. В новом дистрибутиве Debain 7 ядро 3.2 с обновлениями имеет полную поддержку Hyper-V.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/10HV.png" width="718" height="540" alt="" /></p>
+<p>&nbsp;Создаём жёсткий диск и выбираем его размер. Можно использовать уже имеющийся файл с образом системы. Не wim, а vhdx.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/11HV.png" width="718" height="540" alt="" /></p>
+<p style="text-align: justify;">&nbsp;Можно подключить установочный диск, или выполнить это позже. Установка может производится с хостового оптического привода, образа ISO, сети или виртуального флоппи-дисковода.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/12HV.png" width="718" height="540" alt="" /></p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/13HV.png" width="718" height="540" alt="" /></p>
+<p>&nbsp;Всё! Можно подключаться к ВМ (правый клик - connect), подключать образ ISO и устанавливать операционную систему!</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/resource/image/14HV.png" width="647" height="496" alt="" /></p>
+<p style="text-align: right;"><em>&nbsp;январь 2013</em></p>

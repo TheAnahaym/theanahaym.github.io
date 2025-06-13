@@ -1,0 +1,31 @@
+<p style="text-align: justify;">&nbsp;С появлением поддержки UEFI в Hyper-V 2012 R2 можно продемонстрировать установку ОС на диск GPT. Сам процесс установки отличается от установки на диск MBR только разбивкой диска. <span>Установка проводилась на Hyper-V 2012 R2. Конфигурация хоста: Intel i7 2600 3.4 GHz, 16 GB RAM, 2000 GB HDD. Для гостя было выделено 2 GB RAM.</span>&nbsp;Вставляем установочный диск и вперёд:</p>
+<p><img src="http://fs.exonix.ru/2012R2/install1.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;Выбираем язык установки, формат времени и метод ввода.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install2.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012R2/install3.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;Выбираем редакцию установки и принимаем лицензионное соглашение.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install4.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012R2/install5.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;Выбираем тип установки: обновление на месте или чистая установка.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install6.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012R2/install7.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;Выбираем меню "Новый". Имеется ввиду раздел. Windows автоматически разобъёт ваш диск на нужные разделы.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install8.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;При установке на диск GPT создаётся три допонительных разделов. Если вам кто-то говорит, что системные разделы не обязательны, то вы можете прислушаться к этому мнению, только если оно исходит от разработчика Windows. Хотя, на самом деле Windows может работать без раздела Recovery. Без разделов System &amp; MSR - не пробовал.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install9.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;Взглянем на диск с помощью утилиты командной строки <strong>DISKPART</strong>. Командную строку можно вызвать с помощью сочетания клавишь <strong>Shift+F10</strong>. Переключение между командной строкой и графическим интерфейсом установщика можно выполнять с помощью комбинации <strong>ALT+TAB</strong>. На рисунке показан листинг дисков и детализация выбранного диска.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install10.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;Что будет, если ваш диск является MBR ? Удалим все разделы в графическом интерфейсе и конвертируем ваш диск из GPT в MBR. <span style="color: #ff0000;"><strong>Внимание</strong></span>! Операция конвертации удаляет все ваши данные на диске!</p>
+<p><img src="http://fs.exonix.ru/2012R2/install11.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;В графическом интерфейсе пробуем создать раздел на диске MBR... Это займёт чуть больше времени, т.к. Windows автоматически конфертирует диск в GPT. Ещё раз обращаю ваше внимание: если на вашем диске был раздел с вашими данным - <span style="color: #ff0000;"><strong>он будет удалён</strong></span>! Проверяем диск утилитой DISKPART - его тип действительно GPT.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install12.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;Продолжаем установку. По завершении задаём пароль для учётной записи Администратора.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install13.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012R2/install14.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012R2/install15.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;Параллельно с установкой Windows Server 2012 R2 на второй виртуальной машине я запустил установку Windows Server 2008 R2. Новая ОС установилась на 15 минут быстрее.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install16.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;После установки ОС не забудьте сменить имя компьютера и включить автоматическое обновление. Не считая обновлений для IE, сразу установится три обновления для ОС объёмом около 250 MB.</p>
+<p><img src="http://fs.exonix.ru/2012R2/install17.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012R2/install18.png" alt="" width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: right;"><em>23.10.2013</em></p>

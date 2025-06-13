@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Windows_Server.DHCP.2008_R2">DHCP 2008 R2</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server.DHCP">Windows DHCP Server</a></li>
+<li><a href="#!Статьи.Windows_Server.DHCP.2012_R2">DHCP 2012 R2</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp; DHCP сервер - предоставляет управление сетевыми настройками клиентов DHCP. Сетевые настройки это не только IP адрес, маска сети, шлюз по умолчанию и ДНС сервер. DHCP сервер имеет много опций. Подробнее об DHCP <a href="http://technet.microsoft.com/en-us/library/cc896553(v=ws.10).aspx">тут на английском языке</a>. DHCP сервер и клиент "общаются" по <a href="http://ru.wikipedia.org/wiki/DHCP">протоколу DHCP</a>. Начнём с установки роли DHCP. DHCP прекрасно совместим на сервере с ролями AD DS, DNS, WINS. Так же можно устанавливать с ролью WDS, но нужно будет внести некоторые настройки: опция 67. И так, по порядку. Исходные настройки на сервере, являющимся контроллером домена. Сетевая карта имеет статический адрес.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp0.png" /></p>
+<p style="text-align: justify;">Запускаем Server Manager.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp1.png" /></p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp2.png" /></p>
+<p style="text-align: justify;">Выбираем роль DHCP:</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp3.png" /></p>
+<p style="text-align: justify;">некоторые настройки принимаем по умолчанию.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp4.png" /></p>
+<p style="text-align: justify;">Здесь по умолчанию было 127.0.0.1. Меняем на адрес своего ДНС сервера. В нашем случае это адрес контроллера домена. Если есть второй ДНС сервер - его можем указать в альтернативных настройках.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp5.png" /></p>
+<p style="text-align: justify;">Если используете WINS - его адрес указываем тут.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp6.png" /></p>
+<p style="text-align: justify;">Во время установки можно сразу настроить DHCP сервер.<br />Название я обычно беру ко первому и последнему адресу в области. Далее - первый и последний адреса.<br />Тип подсети можно изменить после установки на тот, который вам подходит. Он влияет на сколько адрес арендуется одним клиентом. Чем больше клиентов, тем лучше установить меньшее время аренды. Иначе адреса для выдачи закончатся.<br />Маска сети и шлюз по умолчанию. Шлюз по умолчанию это ваш роутер или прокси сервер.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp7.png" /></p>
+<p style="text-align: justify;">Если не используете IPv6 - его можно выключить.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp8.png" /></p>
+<p style="text-align: justify;">Если используете, не забудьте поменять ДНС адрес для клиентов IPv6. У меня он <strong>не</strong> исправлен. По умолчанию установлено значение петли.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp9.png" /></p>
+<p style="text-align: justify;">Можно сразу авторизовать сервер, можно после установки. Авторизация предназначена для обеспечения безопасности. Как пример, чтобы не было <a href="http://technet.microsoft.com/ru-ru/library/cc781697">сторонних DHCP-Windows в сети</a>.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp10.png" /></p>
+<p style="text-align: justify;">На этом всё. Сервер готов обслуживать клиентов сети.</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp12.png" /></p>
+<p style="text-align: justify;"><strong>Внимание:</strong> после установки, каждой перезагрузки возможны появления&nbsp;<span style="text-decoration: underline;">некоторых</span> ошибок (например у меня про IPv6) в журналах. Это нормальное явление. Главное, чтобы последние событие было успешным (информационное сообщение о запуске службы)</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp13.png" /></p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp14.png" /></p>
+<p style="text-align: justify;">Для проверки открываем консоль управления DHCP:</p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp15.png" /></p>
+<p><img width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/resource/image/DHCP/dhcp16.png" /></p>
+<p style="text-align: justify;">Если DHCP не будет работать, ты вы не увидите, для простоты, зелёных галочек.</p>
+<p style="text-align: justify;">Далее о настройках DHCP.<br />- Address Pool - здесь указывается пул адресов, которые предназначены для раздачи.<br />- Address Leases - здесь вы сможете увидеть, кто уже получил адреса, и срок аренды.<br />- Reservation - здесь вы можете резервировать IP адреса на основании MAC адреса, если хотите, чтобы кому-либо назначался один и тот же адрес. Так же здесь, лично я, записываю адреса, выделененые для серверов, принтеров и других служебных узлов. Особенностью резервации является то, что даже если вы запишите в резерв <strong>адрес вне пула</strong> - <strong>он всё равно будет назначен автоматически</strong> клиенту, как и адреса из пула.<br />- Scope Options - здесь можно добавлять различные опции, которые будет раздавать DHCP сервер. Например маршруты - опция 121.<br />- Server options - опции, назначающиеся на все области. На рисунке опции 6 и 15 - назначены из Server Options.<br />- <a href="http://technet.microsoft.com/ru-ru/library/dd759190.aspx">Filters</a> - содержит два списка разрешённых и запрещённых МАС адресов.</p>
+<p style="text-align: justify;">&nbsp;Про IPv6 я писать не буду, т.к. не имею достаточной практики к этом. Служба DHCP прекрасно кластеризуется. Однако с выходом Server 2012 - два DHCP сервера на двух разных серверах в одном домене могут прекрасно <strong>управлять одной областью</strong>. С помощью DHCP+GPO можно настроить доступ в интернет: кому можно, а кому нельзя. Но об этом в следующей статье.</p>
+<p style="text-align: right;"><em>20.11.2012</em></p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+</body>
+</html>

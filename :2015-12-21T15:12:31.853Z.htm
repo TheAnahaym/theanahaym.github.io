@@ -1,0 +1,157 @@
+<p style="text-align: justify;">&nbsp;В данной статье описывается только базовая настройка прокси сервера с авторизацией Kerberos в Active Directory Windows Server 2016 (на данный момент TP4)&nbsp;без настройки&nbsp;ограничений и прочего. Тестовый стенд: VM&nbsp;Windows Server 2016&nbsp;TP4, VM с Debian 8.2 x64, VM Windows 10 x64. Изначально хотел обновить статью для настройки предыдущих Windows Server и Squid, но решил не городить огород даже из-за нескольких новых&nbsp;(или удалённых старых)&nbsp;строчек.</p>
+<pre><strong>root@squid3:~# uname -a</strong><br>Linux squid3 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt20-1+deb8u1 (2015-12-14) x86_64 GNU/Linux<br><strong>root@squid3:~# lsb_release -a</strong><br>No LSB modules are available.<br>Distributor ID: Debian<br>Description:&nbsp;&nbsp;&nbsp; Debian GNU/Linux 8.2 (jessie)<br>Release:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8.2<br>Codename:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Jessie</pre>
+<p>&nbsp; В Debian 8.2&nbsp;желательно добавить репозитории предыдущих версии, т.к. не все программы присутствуют в новом:</p>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); text-align: justify; color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><strong style="font-weight: bold;">cat /etc/apt/sources.list</strong><br>...<br>deb http://ftp.de.debian.org/debian&nbsp;&nbsp;&nbsp;&nbsp; wheezy&nbsp; main<br>deb http://ftp.de.debian.org/debian&nbsp;&nbsp;&nbsp;&nbsp; squeeze main</pre>
+<p>&nbsp; Указываем адрес DNS сервера и домен.</p>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><strong style="font-weight: bold;">cat /etc/resolv.conf</strong><br>domain test.exonix.ru<br>search test.exonix.ru<br>nameserver 192.168.29.97</pre>
+<p>&nbsp;До сих пор, по непонятным причинам, Debian или Squid не хотят разрешать имя контроллера домена из DNS. Дописываем /etc/hosts:</p>
+<pre>root@squid3:~# cat /etc/hosts<br>127.0.0.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; localhost<br>127.0.1.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; squid3.test.exonix.ru&nbsp;&nbsp; squid3<br><strong>192.168.29.97&nbsp;&nbsp; dc1.test.exonix.ru&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dc1</strong><br># The following lines are desirable for IPv6 capable hosts<br>::1&nbsp;&nbsp;&nbsp;&nbsp; localhost ip6-localhost ip6-loopback<br>ff02::1 ip6-allnodes<br>ff02::2 ip6-allrouters</pre>
+<p>&nbsp;Установка и настройка сервера времени для синхронизации времени с контроллером домена. Для протокола Kerberos это важно.</p>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><strong style="font-weight: bold;">aptitude install ntp</strong><br><strong style="font-weight: bold;">cat /etc/ntp.conf</strong><br>server dc1.test.exonix.ru<br>restrict 127.0.0.1<br><br><strong style="font-weight: bold;">service ntp restart</strong></pre>
+<p>Установка&nbsp;и настройка&nbsp;Kerberos клиента:</p>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><strong style="font-weight: bold;">aptitude install krb5-user</strong></pre>
+<p><strong style="font-weight: bold;"><img height="399" width="912" alt="squid1.png" src="1665845879387.png" style="margin-right: auto; margin-left: auto; display: block;"></strong></p>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><strong>cat /etc/krb5.conf</strong>
+
+[libdefaults]
+	default_realm = TEST.EXONIX.RU
+# for Windows 2008\2012\2016 with AES
+	default_tgs_enctypes = aes256-cts-hmac-sha1-96 rc4-hmac des-cbc-crc des-cbc-md5
+	default_tkt_enctypes = aes256-cts-hmac-sha1-96 rc4-hmac des-cbc-crc des-cbc-md5
+	permitted_enctypes = aes256-cts-hmac-sha1-96 rc4-hmac des-cbc-crc des-cbc-md5
+	default_keytab_name = /etc/squid3/PROXY.keytab
+
+# The following krb5.conf variables are only for MIT Kerberos.
+	krb4_config = /etc/krb.conf
+	krb4_realms = /etc/krb.realms
+	kdc_timesync = 1
+	ccache_type = 4
+	forwardable = true
+	proxiable = true
+
+# The following encryption type specification will be used by MIT Kerberos
+# if uncommented.  In general, the defaults in the MIT Kerberos code are
+# correct and overriding these specifications only serves to disable new
+# encryption types as they are added, creating interoperability problems.
+#
+# Thie only time when you might need to uncomment these lines and change
+# the enctypes is if you have local software that will break on ticket
+# caches containing ticket encryption types it doesn't know about (such as
+# old versions of Sun Java).
+
+#	default_tgs_enctypes = des3-hmac-sha1
+#	default_tkt_enctypes = des3-hmac-sha1
+#	permitted_enctypes = des3-hmac-sha1
+
+# The following libdefaults parameters are only for Heimdal Kerberos.
+	v4_instance_resolve = false
+	v4_name_convert = {
+		host = {
+			rcmd = host
+			ftp = ftp
+		}
+		plain = {
+			something = something-else
+		}
+	}
+	fcc-mit-ticketflags = true
+
+[realms]
+	TEST.EXONIX.RU = {
+		kdc = DC1.TEST.EXONIX.RU
+		admin_server = DC1.TEST.EXONIX.RU
+	}
+
+[domain_realm]
+	.test.exonix.ru = TEST.EXONIX.RU
+	test.exonix.ru = TEST.EXONIX.RU
+
+[login]
+	krb4_convert = true
+	krb4_get_tickets = false
+	default = FILE:/var/log/krb5libs.log
+	kdc = FILE:/var/log/krb5kdc.log
+	admin_server = FILE:/var/log/kadmind.log</pre>
+<p>&nbsp;Установка squid3 и инструментов ldap:</p>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><strong style="font-weight: bold;">aptitude install squid3 ldap-utils</strong></pre>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><strong>root@squid3:~# kinit administrator</strong>
+Password for administrator@TEST.EXONIX.RU:
+root@squid3:~#</pre>
+<p style="text-align: justify;">Создаём файл PROXY.keytab. Учётная запись компьютера предварительно создана, а так же группа для доступа в интернет и пользователь, который может читать всю AD:<br><img height="665" width="763" alt="squid2.png" src="1665845879389.png" style="margin-right: auto; margin-left: auto; display: block;"></p>
+<pre><strong>aptitude install msktutil<br><br>msktutil -c -b "CN=OU" -s HTTP -k /etc/squid3/PROXY.keytab --computer-name SQUID3 --upn HTTP/squid3.test.exonix.ru --server dc1.test.exonix.ru --verbose --enctypes 28</strong><br><br><strong>chgrp proxy /etc/squid3/PROXY.keytab</strong><br><strong>chmod g+r /etc/squid3/PROXY.keytab</strong><br><strong>msktutil --auto-update --verbose<br></strong></pre>
+<p><span>Настройка прокси сервера squid3. Файл отличается от предыдущей версии, так были <a target="_blank" rel="noopener" href="http://www.squid-cache.org/Versions/v3/3.2/RELEASENOTES.html#ss2.6">переименованы хелперы</a> и ещё некоторые изменения:</span></p>
+<pre><strong>cat /etc/squid3/squid.conf</strong>
+####### /etc/squid3/squid.conf Configuration File #######
+####### cache manager
+cache_mgr aleks@test.exonix.ru
+####### kerberos authentication
+auth_param negotiate program /usr/lib/squid3/<span style="color: #ff0000;">negotiate_kerberos_auth</span> -d -s HTTP/squid3.test.exonix.ru
+auth_param negotiate children 10
+auth_param negotiate keep_alive on
+####### provide access via ldap for clients not authenticated via kerberos
+auth_param basic program /usr/lib/squid3/<span style="color: #ff0000;">basic_ldap_auth</span> -R \
+-b "dc=test,dc=exonix,dc=ru" \
+-D squidread@test.exonix.ru \
+-w "1q2w#E$R" \
+-f sAMAccountName=%s \
+-h dc1.test.exonix.ru
+auth_param basic children 10
+auth_param basic realm Internet Proxy
+auth_param basic credentialsttl 1 minute
+####### ldap authorizations
+# restricted proxy access logged
+external_acl_type internet_users %LOGIN /usr/lib/squid3/<span style="color: #ff0000;">ext_ldap_group_acl</span> -R -K \
+-b "dc=test,dc=exonix,dc=ru" \
+-D squidread@test.exonix.ru \
+-w "1q2w#E$R" \
+-f "(&amp;(objectclass=person)(sAMAccountName=%v)(memberof=<span style="color: #ff0000;">CN=INTERNET</span>,OU=OU,DC=test,DC=exonix,DC=ru))" \
+-h dc1.test.exonix.ru
+####### acl for proxy auth and ldap authorizations
+acl auth proxy_auth REQUIRED
+# format "acl, aclname, acltype, acltypename, activedirectorygroup"
+acl RestrictedAccessLog external internet_users INTERNET
+####### squid Defaults
+acl local_net src 192.168.29.0/24
+acl SSL_ports port 443 #https
+acl Safe_ports port 80 # http
+acl Safe_ports port 21 # ftp
+acl Safe_ports port 443 # https
+acl Safe_ports port 70 # gopher
+acl Safe_ports port 210 # wais
+acl Safe_ports port 1025-65535 # unregistered ports
+acl Safe_ports port 280 # http-mgmt
+acl Safe_ports port 488 # gss-http
+acl Safe_ports port 591 # filemaker
+acl Safe_ports port 777 # multiling http
+acl CONNECT method CONNECT
+http_access allow manager localhost
+http_access deny manager
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow localhost
+####### enforce auth: order of rules is important for authorization levels
+http_access allow RestrictedAccessLog auth
+####### logging
+access_log /var/log/squid3/access.log squid
+####### squid defaults
+http_access deny all !local_net
+http_port 3128
+hierarchy_stoplist cgi-bin ?
+coredump_dir /var/spool/squid3
+refresh_pattern ^ftp: 1440 20% 10080
+refresh_pattern ^gopher: 1440 0% 1440</pre>
+<p>&nbsp;Установим веб-сервер apache2 для настройки файла WPAD:</p>
+<pre><strong>aptitude install apache2</strong><br><strong>apache2 -v</strong><br>Server version: Apache/2.4.10 (Debian)<br>Server built:&nbsp;&nbsp; Aug 28 2015 16:28:08</pre>
+<pre style="font: 13px/20px Monaco, Menlo, Consolas, 'Courier New', monospace; margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, 0.14902); color: #333333; text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; display: block; white-space: pre-wrap; -ms-word-break: break-all; -ms-word-wrap: break-word; widows: 1; background-color: #f5f5f5; -webkit-text-stroke-width: 0px;"><span><strong>mkdir /etc/apache2/conf.d/
+vi /etc/apache2/conf.d/wpad.dat
+</strong>AddType application/x-ns-proxy-autoconfig .dat</span></pre>
+<pre><span><strong>vi /var/www/<span style="color: #ff0000;">html</span>/wpad.dat</strong><br><br>function FindProxyForURL(url, host)<br>{ $proxy = "PROXY squid3.test.exonix.ru:3128";<br>// URLs within this network are accessed direct<br>if (isInNet(host, "192.168.29.0", "255.255.255.0")) {return "DIRECT";}<br>if (isInNet(host, "127.0.0.0", "255.0.0.0")) {return "DIRECT";}<br>//Return proxy for EVERYTHING else<br>else return $proxy;<br>}<br><br><strong>apachectl restart</strong></span></pre>
+<p>&nbsp;Для работы необходимо настроить браузер. Адрес сервер пишется в виде FQDN. Если написать IP - работать не будет. Проверьте, что ДНС сервер содержит запись о прокси сервере.<br><img height="544" width="536" alt="squid3.png" src="1665845879391.png" style="margin-right: auto; margin-left: auto; display: block;">&nbsp;сразу после настройки и перезагрузки Windows 8.1, она&nbsp;(не браузер)&nbsp;полезет на некоторые MS службы:</p>
+<pre>1450799659.744&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 192.168.29.91 TCP_DENIED/407 3640 GET http://www.msftncsi.com/ncsi.txt - HIER_NONE/- text/html<br>1450799659.822&nbsp;&nbsp;&nbsp;&nbsp; 70 192.168.29.91 TCP_MISS/200 563 GET <a target="_blank" rel="noopener" href="http://geektimes.ru/post/214953/">http://www.msftncsi.com/ncsi.txt</a> PC1$@TEST.EXONIX.RU HIER_DIRECT/84.53.136.59 text/plain<br>1450799679.104&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 192.168.29.91 TCP_DENIED/407 3795 GET http://de-de.appex-rf.msn.com/cgtile/v1/de-DE/Sports/Today.xml? - HIER_NONE/- text/html<br>1450799679.178&nbsp;&nbsp;&nbsp;&nbsp; 63 192.168.29.91 TCP_CLIENT_REFRESH_MISS/200 1916 GET http://de-de.appex-rf.msn.com/cgtile/v1/de-DE/Sports/Today.xml? aleks@TEST.EXONIX.RU HIER_DIRECT/84.53.136.49 application/xml<br>1450799679.279&nbsp;&nbsp;&nbsp;&nbsp; 55 192.168.29.91 TCP_CLIENT_REFRESH_MISS/200 442 GET http://service.weather.microsoft.com/appex/DesktopTile/PreInstallLiveTile? aleks@TEST.EXONIX.RU HIER_DIRECT/104.86.135.245 -<br>1450799679.339&nbsp;&nbsp;&nbsp;&nbsp; 54 192.168.29.91 TCP_CLIENT_REFRESH_MISS/200 1292 GET http://foodanddrink.tile.appex.bing.com/api/feed/? aleks@TEST.EXONIX.RU HIER_DIRECT/84.53.136.49 application/json<br>1450799679.359&nbsp;&nbsp;&nbsp;&nbsp; 17 192.168.29.91 TCP_CLIENT_REFRESH_MISS/200 1626 GET http://de-de.appex-rf.msn.com/cgtile/v1/de-DE/News/Today.xml aleks@TEST.EXONIX.RU HIER_DIRECT/84.53.136.49 application/xml<br>1450799679.377&nbsp;&nbsp;&nbsp;&nbsp; 17 192.168.29.91 TCP_CLIENT_REFRESH_MISS/200 1525 GET http://de-de.appex-rf.msn.com/cgtile/v1/de-DE/HealthAndFitness/Home.xml? aleks@TEST.EXONIX.RU HIER_DIRECT/84.53.136.49 application/xml<br>1450799679.443&nbsp;&nbsp;&nbsp;&nbsp; 55 192.168.29.91 TCP_CLIENT_REFRESH_MISS/200 1694 GET http://finance.services.appex.bing.com/Market.svc/AppTileV2? aleks@TEST.EXONIX.RU HIER_DIRECT/84.53.136.66 application/xml<br>1450799679.973&nbsp;&nbsp;&nbsp; 485 192.168.29.91 TCP_MISS/200 425 GET http://cdf-anon.xboxlive.com/de-DE/video/feeds/1.2/videolivetile aleks@TEST.EXONIX.RU HIER_DIRECT/104.86.115.40 text/xml</pre>
+<p>Windows 10 Enterprise лезет на несколько другие MS сервисы:</p>
+<pre>1450800646.959&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 192.168.29.89 TCP_DENIED/407 3644 GET http://ipv6.msftncsi.com/ncsi.txt - HIER_NONE/- text/html<br>1450800646.969&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6 192.168.29.89 TCP_MISS/503 6260 GET http://ipv6.msftncsi.com/ncsi.txt DESKTOP-TVN4TLQ$@TEST.EXONIX.RU HIER_DIRECT/2003:8:0:1f::5096:c061 text/html<br>1450800649.968&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 192.168.29.89 TCP_DENIED/407 3640 GET http://www.msftncsi.com/ncsi.txt - HIER_NONE/- text/html<br>1450800650.018&nbsp;&nbsp;&nbsp;&nbsp; 45 192.168.29.89 TCP_MISS/200 563 GET http://www.msftncsi.com/ncsi.txt DESKTOP-TVN4TLQ$@TEST.EXONIX.RU HIER_DIRECT/84.53.136.59 text/plain<br>1450800738.929&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 192.168.29.89 TCP_DENIED/407 3808 CONNECT www.bing.com:443 - HIER_NONE/- text/html<br>1450800749.694&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 192.168.29.89 TCP_DENIED/407 3687 POST http://ssw.live.com/UploadData.aspx - HIER_NONE/- text/html<br>1450800799.200&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 192.168.29.89 TCP_DENIED/407 3939 GET http://ctldl.<span style="color: #ff0000;">windowsupdate</span>.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab? - HIER_NONE/- text/html<br>1450800799.289&nbsp;&nbsp;&nbsp;&nbsp; 76 192.168.29.89 TCP_MISS/200 8070 GET http://ctldl.<span style="color: #ff0000;">windowsupdate</span>.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab? aleks@TEST.EXONIX.RU HIER_DIRECT/84.53.136.92 application/octet-stream</pre>
+<p>&nbsp;Windows Update работает через прокси без дополнительных настроек:</p>
+<pre>1450800900.147&nbsp; 65896 192.168.29.89 TCP_<span style="color: #ff0000;">MISS</span>/200 5501 CONNECT fe2.update.microsoft.com:443 aleks@TEST.EXONIX.RU HIER_DIRECT/134.170.165.248 -</pre>
+<p style="text-align: right;"><em>27.12.2015</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

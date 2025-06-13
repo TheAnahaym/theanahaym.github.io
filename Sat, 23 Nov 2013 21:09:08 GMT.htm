@@ -1,0 +1,16 @@
+<p style="text-align: justify;">&nbsp;В данной небольшой статье я расскажу как менялось поведение ICMP в OS Windows. Данное изменение произошло в OS Vista и очень хорошо иллюстрирует почему ping - не является мерилом доступности узлов в сети, а так же качеством подключения. Лучше проверить службами, чем ping-ами. Для статьи использовались виртуальные машины (XP, Windows Server 2012 R2 и 2008 R2) со следующей схемой сети:</p>
+<p><img height="240" width="293" alt="icmp0.png" src="1665329145153.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Сетевая конфигурация Windows Server 2008 R2:</p>
+<p><img height="768" width="1024" alt="icmp1.png" src="1665329145155.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Приступаем к тестам. Я приведу для сравнения вывод команды PING для трёх ситуаций:</p>
+<p>- 2008 R2 в сети с включённым FireWall<br>- интерфейс 2008 R2 выключен<br>- 2008 R2 в сети с настроенным разрешением ICMPv4.</p>
+<p><img height="768" width="1024" alt="icmp2.png" src="1665329145159.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="icmp3.png" src="1665329145161.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;"><span>&nbsp;Обратите внимание на вторую попытку пинга при выключенном интерфейсе 2008 R2. Начиная Vista ICMP возвращает нам "Заданный узел недоступен", в то время как в первом случае - "Превышен интервал...". Словно ICMP сообщает нам "Эй, сервер в сети, но он не отвечает мне в течении 5 секунд". Ответ "<span>Заданный узел недоступен" в ХР достигается путём отключения интерфейса в ОС - <strong>а это проблема на стороне XP</strong>.</span></span></p>
+<p><span><span><img height="768" width="1024" alt="icmp5.png" src="1665329145163.png" style="display: block; margin-left: auto; margin-right: auto;"></span></span></p>
+<p><span><span>&nbsp;Правило для разрешения ICMP показано ниже.</span></span></p>
+<p><img height="768" width="1024" alt="icmp4.png" src="1665329145165.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;<span style="color: #ff0000;"><em>Причина</em></span> такого поведенения ICMP на самом деле проста. С помощью утилиты <strong>arp</strong> с ключём "<strong>а</strong>" можно увидеть, что после&nbsp;пинга с Windows Vista компьютера с отключенным интерфейсом в таблице МАС адресов Vista не будет МАС адреса пингуемого компьютера. В случае же просто закрытого протокола ICMP МАС адрес всё равно будет доступен.</p>
+<p style="text-align: right;"><em>23.11.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

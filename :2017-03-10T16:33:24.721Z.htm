@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>RDP</p>
+<pre>$event = Get-WinEvent -FilterHashTable @{LogName="security";id=4624}<br />foreach ($event in $event)<br />{ <br /> if ($event.Properties[8].Value -eq 10)<br /> { <br /> $event.TimeCreated<br /> $event.Properties[5].Value<br /> $event.Properties[8].Value<br /> }<br />}</pre>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<p style="text-align: center;"><strong>Клонирование Windows 10&nbsp;</strong></p>
+<p>Данная статья описывает клонирование Windows <strong>10 1703 <span style="color: #ff0000;">x64</span></strong> встроенными средствами DISM. Данный способ клонирования можно применять при переносе системы с HDD на SSD (<em>может иметь объём меньше, чем исходный HDD</em>) в пределах одного копьютера, а так же в доменной сети без переввода компьютера в домен (<em>при использовании imagex (для Windows <strong>7</strong>) требуется обнуление системы с помощь утилиты sysprep, которая требует вывода из домена</em>).</p>
+<p>&nbsp;Исходная система:<br>- рабочий диск на <strong>128</strong> GB (почти голая винда занимает приблизительно&nbsp;<strong>15</strong> GB)<br>- новый диск на <strong>60</strong> GB, разбитый на два раздела по <strong>30</strong> GB (один раздел будет использоваться для хранения образа)</p>
+<p><img height="728" width="683" alt="dism1.png" src="1665329145169.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: justify;">&nbsp;Загружаемся с установочного диска\флешки Windows 10. Выводим список всех разделов на всех дисках и выполняем захват образа операционной системы (обратите внимание на буквы разделов). <strong>Shift + F10</strong> запускают командную строку в установщике Windows.</p>
+<pre>wmic LOGICALDISK LIST BRIEF</pre>
+<pre>Dism /Capture-Image /ImageFile:"<strong>E</strong>:\windows10.wim" /CaptureDir:<strong>C</strong>:\ /Name:Windows10</pre>
+<p><img height="768" width="1024" alt="dism2.png" src="1665329145171.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: justify;">&nbsp;Выключаем компьютер, <strong>отсоединяем</strong> диск с рабочей Windows 10 от материнской платы компьютера, и снова загружаемся с установочного диска\флешки Windows 10. Далее мы как бы продолжаем процесс установки чистой Windows 10 <strong>до момента</strong> разбивки диска. Удаляем пустой раздел (<strong>тот, который не содержит наш образ)</strong>:</p>
+<p><img height="768" width="1024" alt="dism3.png" src="1665329145173.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p>&nbsp;На месте <strong>неразмеченного</strong> раздела создаём новый раздел:</p>
+<p><img height="768" width="1024" alt="dism4.png" src="1665329145175.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: justify;">&nbsp;Эти два шага сэкономят время на создании системных разделов с помощью <strong>diskpart</strong> (<em>как это описано в официальной документации</em>):</p>
+<p><img height="768" width="1024" alt="dism5.png" src="1665329145177.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p>&nbsp;Cнова Shit + F10. Далее уже потребуется diskpart для форматирования нового раздела для системы (<em>тот, который имет файловую систему RAW</em>):</p>
+<pre>diskpart<br>list volume<br>select volume 1<br>format FS=NTFS label="New System"<br>assign letter=G</pre>
+<p><img height="768" width="1024" alt="dism6.png" src="1665329145179.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p>&nbsp;Разворачиваем образ на новом разделе (обратите внимание на <strong>буквы разделов</strong>):</p>
+<pre>dism /Apply-Image /ImageFile:D:\windows10.wim /Index:1 /ApplyDir:G:\</pre>
+<p><img height="386" width="1024" alt="dism7.png" src="1665329145185.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: justify;">&nbsp;Как правило, система после перезагрузки не может загрузиться (единственный минус штатных средств клонирования). Для этого достаточно восстановить системный раздел загрузчика:</p>
+<pre style="text-align: justify;">bcdboot C:\Windows</pre>
+<p><img height="297" width="1024" alt="dism8.png" src="1665329145187.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p>&nbsp;После этого успешно загружаемся в Windows. Раздел с образом можно удалить и добавить к системному разделу.</p>
+<p><img height="768" width="1024" alt="dism9.png" src="1665329145189.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="409" width="499" alt="dism10.png" src="1665329145191.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p><img height="728" width="683" alt="dism11.png" src="1665329145193.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: right;"><em>16.11.2017</em></p>
+<div id="vk_comments"></div>

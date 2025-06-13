@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p style="text-align: justify;">&nbsp;Редко приходится обновлять ядро для Linux, т.к. обычно ядро по умолчанию удовлетворяет всем требованиям и всем приложениям. Однако, в процессе установки MS SQL 2016 на Debain 8.6 c ядром 3.16 выяснилось, что данное ядро по умолчанию не пригодно для установки MS SQL 2016. <a href="/Статьи/MS_SQL/MS_SQL_2016_on_Debian/">Для успешной установки</a> необходимо обновить&nbsp;OpenSSL. Позже выяснил, что Ubuntu 16.04, на которую можно официально установить MS SQL 2016, имеет ядро 4.4. По этому я и задался вопросом обновления ядра в Debian 8.6. Делается это за 5 минут:</p>
+<pre>uname -mrs<br />Linux <span style="color: #ff0000;"><strong>3.16</strong></span>.0-4-amd64 x86_64<br /><br />echo "deb http://ftp.de.debian.org/debian jessie-backports main" &gt;&gt; /etc/apt/sources.list<br />aptitude update<br />aptitude search linux-image<br />aptitude install -t jessie-backports linux-image-amd64<br />aptitude clean<br />reboot<br /><br />uname -mrs<br />Linux <span style="color: #ff0000;"><strong>4.7</strong></span>.0-0.bpo.1-amd64 x86_64</pre>
+<p>&nbsp;После этого установка MS SQL выполняется за пару команд.</p>
+</body>
+</html>

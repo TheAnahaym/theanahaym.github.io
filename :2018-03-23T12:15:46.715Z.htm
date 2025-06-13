@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p style="text-align: center;"><strong>iSCSI Target on Debian 9.4 x64 (<span style="color: #ff0000;">не</span> для кластера)</strong></p>
+<pre>aptitude install targetcli-fb<br />mkdir /iscsi<br /><br />targetcli<br />cd backstores/fileio<br />create disk02 /iscsi/disk02.img 32GB<br />cd /iscsi<br />create iqn.2018-03.storage1.domain.local:storage.target02<br />cd&nbsp;iqn.2018-03.storage1.domain.local:storage.target02/tpg1/luns<br />create /backstores/fileio/disk02<br />cd ../acls<br />create iqn.2018-03.com.microsoft:h-n-2.hyper-v.test <strong>#initiator</strong><br />cd ..<br />set attribute authentication=0<br />exit</pre>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" src="http://fs.exonix.ru/linux/iscsi1.png" width="972" height="691" /></p>
+<p style="text-align: right;"><em>23.03.2018</em></p>
+<p style="text-align: center;"><strong>iSCSI Target on Debian 9.4 x64 <span style="color: #ff0000;">для</span> MS Failover Cluster</strong></p>
+<pre style="text-align: justify;">aptitude install tgt-glusterfs tgt<br />mkdir /iscsi<br />tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2018-04.your.domain.com<br />dd if=/dev/zero of=/iscsi/iscsi-disk1 bs=1M count=8000 <strong>#размер файла в ~8GB</strong><br />tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 1 -b /iscsi/iscsi-disk1<br />tgtadm --lld iscsi --mode target --op bind --tid 1 -I ALL<br />tgtadm --lld iscsi --mode target --op show<br />
+Target 1: iqn.2018-04.com.example:for.all
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+        I_T nexus: 1
+            Initiator: iqn.2018-03.com.microsoft:h-n-3.hyper-v.test alias: none
+            Connection: 1
+                IP Address: 10.254.1.82
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 8389 MB, Block size: 512
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            SWP: No
+            Thin-provisioning: No
+            Backing store type: null
+            Backing store path: None
+            Backing store flags:
+    Account information:
+    ACL information:
+        ALL</pre>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" src="http://fs.exonix.ru/linux/iscsi2.png" width="721" height="404" /></p>
+<p style="text-align: right;"><em>06.04.2018</em></p>
+</body>
+</html>

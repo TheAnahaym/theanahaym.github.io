@@ -1,0 +1,31 @@
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Операционные_системы.Установка_Win_Serv_2012">Установка Windows Server 2012</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Операционные_системы.Установка_Debian_6">Установка Debian 6</a></li>
+<li><a href="#!Статьи.Операционные_системы.Установка_Debian_7">Установка Debian 7</a></li>
+<li><a href="#!Статьи.Операционные_системы.Мой_Windows_и_вирусы">Мой Windows и вирусы</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;Обзор операционной системы Windows Server 2012 начну с установки. Процесс установки будет в картинках. Установка проводилась на Hyper-V 2012. Конфигурация хоста: Intel i7 2600 3.4 GHz, 16 GB RAM, 2000 GB HDD. Для гостя было выделено 2 GB RAM. В данной конфигурации установка длилась 13 минут. И ещё 3 минуты после ввода пароля Администратора.&nbsp;Microsoft решили переименовать Windows Server 8 Beta на Windows Server 2012. Что, на мой взгляд, правильно. Не раз встречал темы про Windows 8 в разделах для серверов... Установка Windows Server 2012 мало чем отличается от установки&nbsp;<a href="http://www.exonix.ru/?kol3xjxformxjmqxbkggrjt.htm">Windows Server 2012 RC</a>. Краткое описание в картинках:</p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.1.png" width="880" height="741" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.2.png" width="880" height="741" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;Windows Server 2012 доступен только <a href="http://blogs.technet.com/b/vm/archive/2012/07/15/windows-server-2012-editions-and-licensing.aspx">в двух редакциях</a>. При установке только ядра (Server Core Installation) в дальнейшем можно вернуть графический интерфейс без переустановки ОС.</p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.3.png" width="880" height="741" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.4.png" width="880" height="741" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.5.png" width="880" height="741" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.6.png" width="880" height="741" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Небольшое отступление от темы. На следующем рисунке изображена разбивка диска хоста с Hyper-V ролью и RAID-0. Установка была на EFI. Пока не ясно, почему на диске, учавствующем в RAID-0, появился раздел напоминающий MSR. Ведь диски то MBR, а не GPT, как загрузочный диск.</p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.7.png" width="880" height="741" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.8.png" width="880" height="741" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.9.png" width="880" height="741" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.11.png" width="880" height="741" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.10.png" width="880" height="741" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>&nbsp;После установки необходимо <strong>переименовать* сервер</strong> и <strong>установить все обновления</strong>.</p>
+<p>&nbsp;<img src="http://fs.exonix.ru/2012/RTM/2012.12.png" width="880" height="741" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><em>* Скрин сделан с сервера настроенного как <a href="http://www.exonix.ru/?e2hojrlmnths5dpdu3gpz2l.htm">контроллер домена</a></em>.</p>
+<p style="text-align: right;">&nbsp;<em>21.03.2013</em></p>

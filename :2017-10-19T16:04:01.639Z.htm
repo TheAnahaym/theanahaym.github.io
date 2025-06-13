@@ -1,0 +1,36 @@
+<p style="text-align: center;"><strong>&nbsp;L2TP VPN между сетями на базе Windows Server 2016 и PSK.</strong></p>
+<p style="text-align: justify;">&nbsp;Имеется сеть из семи узлов. По три узла в каждой сети и маршрутизатора между ними. Примерная схема изображена ниже. На всех хостах установлен Windows Server 2016. Для VPN будет использоваться по одному хосту<strong> с одним</strong> сетевым интерфейсом. Данная схема имитирует ситуацию, когда нет возможности настроить VPN на шлюзе.<img height="168" width="669" alt="sts9.png" src="1665845879411.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: justify;">&nbsp;Для работы L2TP VPN необходимо пробросить три UDP порта: 1701, 500, 4500. Так это делается&nbsp;<span style="color: #ff0000;"><strong>в RRAS</strong></span>, который подключён к вашему Интернет Провайдеру.</p>
+<p style="text-align: center;"><img height="494" width="802" alt="sts1.png" src="1665845879413.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: left;">Если у вас используется Cisco в роли маршрутизатора, то там порты пробрасываются так, где Dialer0 - внешний интерфейс, 10.254.1.8 - IP адрес VPN сервера:</p>
+<pre class="prettyprint prettyprinted"><span class="pln">ip nat inside source </span><span class="kwd">static</span><span class="pln"> udp </span><span class="lit">10.254</span><span class="pun">.</span><span class="lit">1.8</span> <span class="lit">1701</span> <span class="kwd">interface</span> <span class="typ">Dialer0</span> <span class="lit">1701</span><span class="pln">
+ip nat inside source </span><span class="kwd">static</span><span class="pln"> udp </span><span class="lit">10.254</span><span class="pun">.</span><span class="lit">1.8</span> <span class="lit">4500</span> <span class="kwd">interface</span> <span class="typ">Dialer0</span> <span class="lit">4500</span><span class="pln">
+ip nat inside source </span><span class="kwd">static</span><span class="pln"> udp </span><span class="lit">10.254</span><span class="pun">.</span><span class="lit">1.8</span> <span class="lit">500</span> <span class="kwd">interface</span> <span class="typ">Dialer0</span> <span class="lit">500</span></pre>
+<p style="text-align: left;">&nbsp;Для каждого порта так же должно быть разрешающее правило на фаерволе <strong>VPN сервера</strong>. Для IKE (500, 4500) правила создаются вручную.</p>
+<pre>PS C:\&gt; Get-NetFirewallRule -DisplayName "IKE NAT","*L2TP*" | Get-NetFirewallPortFilter | ft<br><br>Protocol LocalPort RemotePort IcmpType DynamicTarget<br>-------- --------- ---------- -------- -------------<br>UDP 1701 Any Any Any<br>UDP {500, 4500} Any Any Any<br>UDP Any 1701 Any Any</pre>
+<p style="text-align: justify;">&nbsp;Также не забываем правку реестра (на VPN сервере). Без этго L2TP не будет работать <strong>за NAT</strong>:</p>
+<pre>Windows Registry Editor Version 5.00<br><br>[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PolicyAgent]<br>"AssumeUDPEncapsulationContextOnSendRule"=dword:00000002</pre>
+<p style="text-align: justify;">&nbsp;Настраиваем RAS на работу с соединениями по вызову.</p>
+<p style="text-align: center;"><img height="423" width="1000" alt="sts2.png" src="1665845879415.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: justify;">&nbsp;Даная сеть будет использовать общий ключ PSK (может позже напишу про сеhтификаты, но в принципе, оно не отличается от уже <a href="/Статьи/Windows_Server/VPN_L2TP_IKEv2/">имеющейся статьи</a>).</p>
+<p style="text-align: center;"><img height="676" width="600" alt="sts3.png" src="1665845879417.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p style="text-align: justify;">&nbsp;Создаём соединение по требованию (на каждом VPN сервере). Я даю название на основании того, куда сервер будет подключаться. В данном случае сервер RAS1 будет подключаться к серверу RAS2 (192.168.100.254):</p>
+<p style="text-align: center;"><img height="791" width="1000" alt="sts4.png" src="1665845879419.png" class=""></p>
+<p style="text-align: justify;">&nbsp;Далее задаётся удалённая локальная сеть, а также сеть, которая будет использоваться для создания туннеля. При отсутствии DHCP это - 169.254.0.0/16.</p>
+<p style="text-align: center;"><img height="394" width="1000" alt="sts5.png" src="1665845879421.png" class=""></p>
+<p style="text-align: justify;">&nbsp;Задаём учётные данные для входящего (будет создана локальная учётная запись) и исходящего подключения:</p>
+<p style="text-align: center;"><img height="394" width="1000" alt="sts6.png" src="1665845879423.png" class=""></p>
+<p style="text-align: justify;">&nbsp;Вот тут я добавил сеть, использующуюся для построения туннеля. Если в филиалах есть и другие сети, к которым необходим доступ, то все эти сети должны быть перечислены в "статические маршруты":</p>
+<p style="text-align: center;"><img height="277" width="716" alt="sts8.png" src="1665845879425.png" class=""></p>
+<p style="text-align: justify;">&nbsp;В свойствах подключения вводим PSK:</p>
+<p style="text-align: center;"><img height="524" width="569" alt="sts7.png" src="1665845879427.png" class=""></p>
+<p style="text-align: justify;">&nbsp;Готово. Данное подключение будет включаться при обращении в удалённую сеть. Можно настроить, чтобы подключение было постоянным.</p>
+<p><img height="450" width="364" alt="sts10.png" src="1665845879429.png" style="display: block; margin-left: auto; margin-right: auto;" class=""></p>
+<p>&nbsp;Чтобы клиенты находили удалённые сети, они должны знать маршрут в эти сети. Для этого необходимо добавить статический маршрут на шлюзе:</p>
+<pre>route ADD <em>-p 10.10.10.0</em> MASK 255.255.255.0 <strong>10.20.20.22</strong><br>route ADD <em>-p 10.20.20.0</em> MASK 255.255.255.0 <strong>10.10.10.11</strong></pre>
+<p>Или в 121 опции в DHCP (<strong>внимание</strong>, 121 опция не рекомендована при наличии в сети современных Linux (наgример, после Debian <strong>7</strong>) машин с динамическими адресами. При наличии 121 опции Linux машины потеряют шлюз по умолчанию. Это лечится добавлением ещё одного шлюза по умолчанию в 121 опцию).</p>
+<p style="text-align: right;"><em>19.10.2017<br>09.04.2018 (дополнение)</em></p>
+<div style="text-align: right;" id="vk_comments">&nbsp;</div>
+<div id="fb-root">&nbsp;</div>
+<p>&nbsp;</p>
+<div data-href="http://exonix.ru/#!Статьи/Windows_Server/Active_Directory/Office_365_-_DirSync/" data-width="670" data-numposts="20" class="fb-comments">&nbsp;</div>

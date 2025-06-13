@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Exchange.Резервное_копирование_баз_Exchange_2010_SP2.Восстановление_баз_Exchange_2010_SP2">Восстановление баз Exchange 2010 SP2</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Exchange.Резервное_копирование_баз_Exchange_2010_SP2">Резервное копирование баз Exchange 2010 SP2</a></li>
+<li><a href="#!Статьи.Exchange.Установка_Exchange_2013">Установка Exchange 2013</a></li>
+<li><a href="#!Статьи.Exchange.Базовая_настройка_Exchange_2013">Базовая настройка Exchange 2013</a></li>
+<li><a href="#!Статьи.Exchange.Postfix_-_ClamAv_-_Exchange_2010">Postfix, ClamAV, Exchange 2010</a></li>
+<li><a href="#!Статьи.Exchange.Exchange_2010_PowerShell">Exchange 2010 PowerShell</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;Дополнительная информация о восстановлении данным способом на сайте <a href="http://technet.microsoft.com/ru-ru/library/dd876873(v=exchg.141).aspx">microsoft</a>. Для начала необходимо скопировать имеющийся бекап на новый сервер. Далее, можно подключить VHD как логический диск. Из него скопировать нужную нам базу.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr1.png" /></p>
+<p style="text-align: justify;">Attach VHD - присоеденить VHD. После подключения у нас будет логический диск, равный оригинальному диску на исходном сервере. Не смотря на то, что бекап был меньше 1 GB.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr2.png" /></p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr3.png" /></p>
+<p style="text-align: justify;">&nbsp;Далее на Exchange Server создаём новую базу. Желательно с одинаковым именем.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr4.png" /></p>
+<p style="text-align: justify;">&nbsp;Для того, чтобы поменять файлы базы данных в начале необходимо новую базу отмонтировать.</p>
+<p>&nbsp;&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr6.png" /></p>
+<p style="text-align: justify;">&nbsp;Дальнейшие действия выполняются в Power Shell Exchange и утилитой eseutil.exe. Разрешим восстановление базы из архива:<br />&nbsp;set-mailboxdatabase -id new -allowfilerestore:$true</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr7.png" /></p>
+<p style="text-align: justify;">&nbsp;Просмотр состояния базы данных нам покажет, что она была "грязно" выключена. Нам необходимо вернуть состояние Clean Shutdown.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" src="http://fs.exonix.ru/exch/2010/exr8.png" /></p>
+<p style="text-align: justify;">&nbsp;Для этого восстановим базу данных:<br />&nbsp;eseutil.exe /p "путь_до_базы"</p>
+<p style="text-align: justify;">&nbsp;<strong>Внимание!</strong> На жёстком диске должно быть свободное место размером не менее самой базы! В противном случае восстановление будет произведено не полностью.</p>
+<p>&nbsp;<img style="display: block; margin-left: auto; margin-right: auto;" src="http://fs.exonix.ru/exch/2010/exr9.png" /></p>
+<p style="text-align: justify;">&nbsp;Восстановление базы объёмом 33 GB на сервере IBM заняло у меня примерно 1 час. В нашем примере было достастаточно половины минуты.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr10.png" /></p>
+<p style="text-align: justify;">&nbsp;Монтируем базу обратно.&nbsp;</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr11.png" /></p>
+<p style="text-align: justify;">&nbsp;Теперь сообщим Exchange серверу, что нужно просканировать базу на предмет отключённых почтовых ящиков: <br />&nbsp;Clean-Mailboxdatabase -id new</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr12.png" /></p>
+<p style="text-align: justify;">&nbsp;После обновления EMC в Disconnected Mailbox мы увидим все наши почтовые ящики, которые можно подключать пользователям.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr13.png" /></p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr14.png" /></p>
+<p style="text-align: justify;">&nbsp;Сравним информацию о количестве объектов в базе - оно совпадает с оригиналом.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr15.png" /></p>
+<p style="text-align: justify;">&nbsp;Проверим почту через OWA, а так же наличие правил для почтового ящика. Всё на месте.</p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr16.png" /></p>
+<p>&nbsp;<img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2010/exr17.png" /></p>
+<p style="text-align: justify;">&nbsp;На этом восстановление завершено.</p>
+<p style="text-align: right;"><em>18.01.2013</em></p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+</body>
+</html>

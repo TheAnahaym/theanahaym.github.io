@@ -1,0 +1,39 @@
+<p>&nbsp;<strong>Сервер Сетевых Политик</strong> (network policy server) предназначен для аутентификации пользователей и устройств по требованию используя протокол RADIUS. В основном используется с такими технологиями как VPN и IEEE 802.1X (<a href="https://en.wikipedia.org/wiki/Network_Access_Control" target="_blank" rel="noopener">контроль сетевого доступа</a> на коммутаторах и WiFi точек доступа). Можно совмещать с ролью AD DS на одном сервере, но только если Windows Server установлен c графической оболочкой. В данной статье будут описаны настройки для WiFi, VPN, Port-Based Security на коммутаторах, а так же настройка RADIUS Proxy для сетей с двумя AD доменами на базе Windows Server 2019.</p>
+<p>&nbsp;Установка производится в один "клик" через PowerShell:</p>
+<pre>Install-WindowsFeature NPAS -IncludeManagementTools</pre>
+<h3>&nbsp;<strong>Основные понятия:</strong></h3>
+<p>&nbsp;<a href="https://docs.microsoft.com/ru-ru/windows-server/networking/technologies/nps/nps-radius-clients-configure" target="_blank" rel="noopener"><strong>Клиенты RADIUS</strong></a> - Узлы сети, в том числе и RADIUS Proxy, которым можно подключаться к RADIUS для аутентификации. Можно указать как отдельный хост, так и целую сеть, что удобно когда, например, для коммутаторов или точек доступа выделена отдельная сеть. Для создания Клиента RADIUS необходимо заполнить "Название Клиента", "IP Address" и "Shared Secret"</p>
+<p><strong><img style="display: block; margin-left: auto; margin-right: auto;" title="nps1.png" src="1589641443083/nps1.png" alt="" width="1024" height="213"></strong><strong><img style="display: block; margin-left: auto; margin-right: auto;" title="nps2.png" src="1589641443085/nps2.png" alt="" width="568" height="731"></strong></p>
+<p><strong>&nbsp;<a href="https://docs.microsoft.com/ru-ru/windows-server/networking/technologies/nps/nps-plan-proxy" target="_blank" rel="noopener">Удалённый RADIUS Сервер</a></strong> - RADIUS сервера, которые могут быть находится в другом домене.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" title="nps3.png" src="https://www.redaktr.com/us-east-1:df521432-f688-4bb9-baa9-add1ace190c1/1589641443087/nps3.png" alt="" width="1024" height="345"></p>
+<p>&nbsp;</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" title="nps4.png" src="1589641443089/nps4.png" alt="" width="1024" height="669"></p>
+<p>&nbsp;</p>
+<p>&nbsp;<strong><a href="https://docs.microsoft.com/ru-ru/windows-server/networking/technologies/nps/nps-crp-crpolicies" target="_blank" rel="noopener">Политики запросов на подключение</a></strong> - политики, которые определяют что делать с тем или иным запросом: или обработать на локальном сервере или перенаправить запрос на другой RADIUS сервер. Если у Вас один домен - политику лучше не трогать.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" title="nps5.png" src="1589641443091/nps5.png" alt="" width="1024" height="546"></p>
+<p>&nbsp;Пример перенаправления запросов на RADIUS в другой домен на основании части FQDN хоста в домене <strong>domain.domain.com</strong>:</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" title="nps8.png" src="1589654228236/nps8.png" alt="" width="1024" height="804"></p>
+<p>&nbsp;<a href="https://docs.microsoft.com/ru-ru/windows-server/networking/technologies/nps/nps-np-configure" target="_blank" rel="noopener"><strong>Сетевые политики\Политики сети</strong></a> - политики, определяющие требования для клиентов (в данном случае WiFi, VPN, Port Security) такие как методы аутентификации (Пароль, Сертификат), шифрования и т.д.. По умолчанию доступ запрещён двумя политиками. Сетевые политики являются сами важными настройками, и поначалу могут показаться трудными в настройке.<img style="display: block; margin-left: auto; margin-right: auto;" title="nps6.png" src="1589641443093/nps6.png" alt="" width="1024" height="383"></p>
+<h3>&nbsp;</h3>
+<h3>&nbsp;<strong>Примеры настроек сетевых политик:</strong></h3>
+<p><strong>&nbsp;WiFi </strong>с аутентификацией <strong>на пользовательских</strong> сертификатах (<strong>AD DS</strong> должен быть установлен, пользователь должен иметь простой сертификат <strong>шаблона</strong> "пользователь"):</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" title="nps7.png" src="1589654228234/nps7.png" alt="" width="1024" height="663"></p>
+<p>&nbsp;<strong>VPN </strong>с аутентификацией <strong>на пользовательских</strong> сертификатах:</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" title="nps10.png" src="1589654228240/nps10.png" alt="" width="1024" height="733"></p>
+<p>&nbsp;<strong>Port-Based Security </strong>с аутентификацией на <strong>компьютерных</strong> сертификатах:</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" title="nps9.png" src="1589654228238/nps9.png" alt="" width="1024" height="672"></p>
+<p>&nbsp;В конце хотелось бы добавить, что данные настройки RADIUS используются не только для Windows клиентов, но так же и для Linux и macOS (<em>L2TP VPN с аутентификацией по логину и паролю</em>)</p>
+<p>&nbsp;</p>
+<p style="text-align: right;"><em>16.05.2020</em></p>
+<div id="vk_comments" style="text-align: right;">&nbsp;</div>
+<div id="fb-root">&nbsp;</div>
+<p>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v2.8";
+  fjs.parentNode.insertBefore(js, fjs);
+ }(document, 'script', 'facebook-jssdk'));</script>
+</p>
+<div class="fb-comments" data-href="http://exonix.ru/#!Статьи/Windows_Server/NPS/" data-width="670" data-numposts="20">&nbsp;</div>

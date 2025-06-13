@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Обновление_Active_Directory_2008_R2_до_2012_R2">Обновление Active Directory 2008 R2 до 2012 R2&nbsp;</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012_R2">Контроллер домена 2012 R2</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2008_R2">Контроллер домена 2008 R2</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012_и_NAT">Контроллер домена 2012 и NAT</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Резервное_копирование_Active_Directory_2012">Резервное копирование Active Directory 2012&nbsp;</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Доверительные_отношения_между_2008_R2_и_2012">Доверительные отношения между 2008 R2 и 2012</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;Вот и настала пара обновить контроллеры домена до поледней версии 2012 R2. Но чтобы обновление было ещё интереснее, я решил его немного усложнить. Представим, что наша компания очень бурно развивается, и вот уже новый этаж здания готовится к эксплуатации. Пусть на каждом этаже здания раположено про 150 рабочих мест. Следовательно, одной сети на 253 адреса для 300 рабочих мест уже не достаточно. По этому было принято решение ввести ещё одну сеть и установить новый контроллер домена в этой сети. Между сетями установлен маршрутизатор, который и занимается <a href="#!Статьи.Сети.Настройка_маршрутизации_сетей_Windows_и_Linux">маршрутизированием между сетями</a>.</p>
+<p style="text-align: justify;">&nbsp;Все сервера и клиенты, приведённые в этой статье, установлены на виртуальные машины Hyper-V 2012 R2. Конфигурация хоста и виртуальных машин приведены ниже.<br /><span>- Хостовой сервер: Intel i7 2700,&nbsp;</span><strong>16</strong><span>&nbsp;GB RAM, ATI 4550, Windows Server 2012 R2 Eval, диск с файлами VHDX на RAID-0.</span><br />- Виртуальный контроллер домена 2008 R2: CPU x2, RAM 2 GB, Network Private <strong>1<br /></strong>- Виртуальный клиент Windows 7: CPU x2, RAM 2 GB,&nbsp;<span>Network Private&nbsp;</span><strong>1</strong><br />- Виртуальный маршрутизатор Windows Server 2008 R2: CPU x2, RAM 2 GB,&nbsp;<span>Network Private&nbsp;</span><strong>1 </strong>+&nbsp;Network Private<strong><span> 2 </span></strong>+ External Network<strong><span><br /></span></strong>-<strong><span>&nbsp;</span></strong>Виртуальный контроллер домена 2012 R2: CPU x2, RAM 2GB,&nbsp;<span>Network Private</span><strong><span>&nbsp;2</span></strong><br />- Виртуальный клиент Windows 8.1: CPU x2, RAM 2 GB,&nbsp;<span>Network Private</span><strong><span>&nbsp;2</span></strong></p>
+<p style="text-align: justify;">&nbsp;Вот такая получилась сеточка:</p>
+<p><img width="476" height="482" style="display: block; margin-left: auto; margin-right: auto;" src="http://fs.exonix.ru/2012R2/adup1.png" /></p>
+<p>&nbsp;Настройка RRAS. Для интерфейса К включён NAT. Две сети натируются в его адрес. Хотя это не обязательное условие, просто решил сделать ради интереса.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup3.png" /></p>
+<p>&nbsp;Настройки первого контроллера домена 2008 R2. Находится в сети 10.10.<strong>10</strong>.0</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup2.png" /></p>
+<p>&nbsp;Настройки установленного Windows Server 2012 R2. Находится в сети 10.10.<strong>20</strong>.0. <strong>Сервер должен быть членом домена</strong>.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup4.png" /></p>
+<p>&nbsp;Все установки ролей начинаются с Server Manager.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup5.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup6.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup7.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup8.png" /></p>
+<p>Выбираем Active Directory Domain Services и все предложенные компонеты.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup9.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup10.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup11.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup12.png" /></p>
+<p>&nbsp;Повышаем сервер до контроллера домена: Promote this server to a domain controller.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup13.png" /></p>
+<p>&nbsp;Выбираем "Добавить контроллер домена в существующий домен". Пишем имя домена и учётные данные администратора домена.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup14.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup15.png" /></p>
+<p>&nbsp;Т.к. в ДНС у меня был указан мой корпоративный ДНС сервер, а он ничего не знает от домене exonix.internal, то получаем ошибку.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup16.png" /></p>
+<p>&nbsp;Исправляем настройки сетевой карты, указывая в ДНС IP адрес действующего контроллера домена.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup17.png" /></p>
+<p>&nbsp;После изменения настроек, успешно находим наш домен.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup18.png" /></p>
+<p>&nbsp;Выбираем роли контроллера домена, определяем сайт и указываем пароль для режима восстановления каталогов.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup19.png" /></p>
+<p>&nbsp;Как и раньше - нет ДНС, значит делегировать ДНС-зону пока не кому.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup20.png" /></p>
+<p>&nbsp;Выбираем источник репликации. Для филиала с медленным интернетом можно использовать подготовелнный оптический носитель.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup21.png" /></p>
+<p>&nbsp;Служебные папки оставляем без изменения.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup22.png" /></p>
+<p>&nbsp;Начиная с Windows Server 2012 обновление схемы и леса домена происходит в атоматическом режиме во время установки контроллера домена. <a href="#!Статьи.Архив.Обновление_Active_Directory_2008R2_до_2012">Ручное обновление</a> ещё поддерживается.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup23.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup24.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup25.png" /></p>
+<p>&nbsp;Можно войти доменным администратором или своей учётной записью.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup26.png" /></p>
+<p>&nbsp;В ДНС сервере появилась запись о новом узле.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup27.png" /></p>
+<p>&nbsp;На новом ДНС сервере появилась реплика всей доменной зоны.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup28.png" /></p>
+<p style="text-align: justify;">&nbsp;В оснастке Active Directory Сайты и Службы появились коннекторы по умолчанию между контроллерами домена. Их достаточно для функционирования домена и не требуют дополнительной настройки. Там же в оснастке определяем новую сеть в наш сайт.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup29.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup34.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup35.png" /></p>
+<p>&nbsp;Создаём новую обратную зону для новой сети 10.10.<strong>20</strong>.0</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup30.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup31.png" /></p>
+<p style="text-align: justify;">&nbsp;На новом контроллере домена меняем настройки ДНС в сетевой карте: первый адрес сам на себя, второй адрес на партнёра, третий адрес - петля. Со времён Windows Server 2008 R2 (может и просто 2008) нет необходимости указывать первым адресом партнёра. Но если в сети есть 2003 сервер - там всё ещё следует указать адрес другого ДНС сервера.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup32.png" /></p>
+<p>&nbsp;Так же меняем порядок ДНС серверов на первом контроллере домена.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup33.png" /></p>
+<p>&nbsp;Включаю две виртуальные клиентские машины. К сожалению, пять виртуальных машин на SATA-II RAID-0 не очень производительная конфигурация. Но, что есть, то есть. На клиенте Windows 7 указываем настройки для сети 10.10.10.0 - <a href="#!Статьи.Windows_Server_Services.DHCP_2008_R2">DHCP сервера</a> в стенде нет.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup36.png" /></p>
+<p>&nbsp;Вводим в домен.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup37.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup38.png" /></p>
+<p>&nbsp;Настраиваем на соответсвующую сеть 10.10.<strong>20</strong>.0 клиент Windows 8 и так же вводим в домен.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup39.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup42.png" /></p>
+<p></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup43.png" /></p>
+<p>&nbsp;После перезагрузки клиента Windows <strong>7</strong> проверям в каком сервере он прошёл авторизацию.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup44.png" /></p>
+<p style="text-align: justify;"><span>&nbsp;После перезагрузки клиента Windows <strong>8</strong> проверям в каком сервере он прошёл авторизацию. Каждый клиент авторизуется на контроллере домена в соотвествии со своим сайтом и сетью определённой в сайте.</span></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup45.png" /></p>
+<p style="text-align: justify;">&nbsp;Для полной миграции на сервер 2012 R2 необходимо (но не обязательно) выполнить передачу ролей FSMO. С помощью утилиты netdom можно посмотреть текущих владельцев ролей FSMO.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup46.png" /></p>
+<p style="text-align: justify;">&nbsp;Передача или захват ролей можно осуществить с помощью утилиты NTDSUTIL. Это проще, чем открывать несколько оснасток для передачи ролей FSMO.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup47.png" /></p>
+<p>&nbsp;Передаём роль PDC.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup48.png" /></p>
+<p>&nbsp;Передаём роль RID master и другие роли.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup49.png" /></p>
+<p>&nbsp;После передачи всех ролей снова смотрим на список владельцев ролей FSMO.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup50.png" /></p>
+<p style="text-align: justify;">&nbsp;В качестве теста отключим Windows Server 2008 R2 и перезагрузим клиент Windows 7 и вновь в нём залогинимся, чтобы посмотреть сервер авторизации. Им окажется новый сервер 2012 R2. При этом не будет работать утилита nslookup с параметрами по умолчанию (по умолчанию утилита будет обращаться к отключенному ДНС серверу). Интернет работать будет.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup51.png" /></p>
+<p style="text-align: justify;">&nbsp;Hyper-V 2012 и 2012 R2 позволяют менять сетевую карту не выключая ВМ. Поменяем сетевую карту с Private <strong>1</strong> на Private <strong>2</strong>. Затем поменяем настройки сетевой карты на сеть 10.10.20.0.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup52.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/adup53.png" /></p>
+<p style="text-align: justify;">&nbsp;После перезагрузки клиента Windows 7 и новой авторизации клиент будет работать в новой сети. Если контроллер домена 2008 R2 больше не нужен, его <a href="http://technet.microsoft.com/ru-ru/library/cc771844(v=ws.10).aspx" target="_blank" rel="noopener">можно удалить</a>.</p>
+<p style="text-align: right;"><em>28.10.2013</em></p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Windows_Server_Services.PowerShell.Printscreen">Printscreen</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.PowerShell.Аудит_сервера_печати">Аудит сервера печати</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp; Если вам нужно настроить мониторинг за компьютером во время работы вашего ребёнка, вы можете использовать программное обеспечение называемое "кейлоггер". Однако если ваше "чадо" хорошо разбирается в компьютерах, то легко вычислит данное ПО с помощью антивирусного ПО. Что бы не обещали вам разрабочтики кейлоггеров, но антивирусы, Windows Defender и AnvirTaskMаnager своё дело знают. При этом кейлоггеры стоят денег. Как быть? Я подумал: а может power shell что-нибудь такое умеет делать? Потом подумал google. Я добавил только как именовать файл. Результат:</p>
+<pre><span>[reflection.assembly]::LoadWithPartialName("System.Drawing") &gt; $null</span><br /><span>$Bitmap = new-object System.Drawing.Bitmap 1024,768</span><br /><span>$Size = New-object System.Drawing.Size 1024,768</span><br /><span>$FromImage = [System.Drawing.Graphics]::FromImage($Bitmap)</span><br /><span>$FromImage.copyfromscreen(0,0,0,0, $Size,</span><br /><span>([System.Drawing.CopyPixelOperation]::SourceCopy))</span><br /><span>$today</span><span>&nbsp;= get-date -DisplayHint date -UFormat %d.%m.%y.%H.%M.%S</span><br /><span>$Bitmap.Save(</span><strong>"С:\Windows\anyfolder$\<span>$today</span>.png</strong><span>",</span><br /><span>([system.drawing.imaging.imageformat]::png));&nbsp;</span></pre>
+<p style="text-align: justify;">&nbsp;Разрешение снимка 1024х768 - это потому, что у испытуемый компьютер был виртуальной машиной с данным разрешением экрана. Если у вас два и более мониторов, нужно сложить разрешения по горизонтали. Если мониторы имеют разные разрешения, тогда нужно вычилсять смещение:</p>
+<pre class="prettyprint prettyprinted"><span class="pln"><span>Add-Type -AssemblyName System.Windows.Forms&nbsp;</span><br /></span><span class="typ">System</span><span class="pun">.</span><span class="typ">Windows</span><span class="pun">.</span><span class="typ">Forms</span><span class="pun">.</span><span class="typ">Screen</span><span class="pun">]::</span><span class="typ">AllScreens</span><span class="pln">
+</span><span class="typ">BitsPerPixel</span><span class="pln"> </span><span class="pun">:</span><span class="pln"> </span><span class="lit">32</span><span class="pln">
+</span><span class="typ">Bounds</span><span class="pln">       </span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">X</span><span class="pun">=</span><span class="lit">0</span><span class="pun">,</span><span class="pln">Y</span><span class="pun">=</span><span class="lit">0</span><span class="pun">,</span><span class="typ">Width</span><span class="pun">=</span><span class="lit">1280</span><span class="pun">,</span><span class="typ">Height</span><span class="pun">=</span><span class="lit">1024</span><span class="pun">}</span><span class="pln">
+</span><span class="typ">DeviceName</span><span class="pln">   </span><span class="pun">:</span><span class="pln"> \\</span><span class="pun">.</span><span class="pln">\DISPLAY1
+</span><span class="typ">Primary</span><span class="pln">      </span><span class="pun">:</span><span class="pln"> </span><span class="kwd">True</span><span class="pln">
+</span><span class="typ">WorkingArea</span><span class="pln">  </span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">X</span><span class="pun">=</span><span class="lit">0</span><span class="pun">,</span><span class="pln">Y</span><span class="pun">=</span><span class="lit">0</span><span class="pun">,</span><span class="typ">Width</span><span class="pun">=</span><span class="lit">1280</span><span class="pun">,</span><span class="typ">Height</span><span class="pun">=</span><span class="lit">994</span><span class="pun">}</span><span class="pln">
+
+</span><span class="typ">BitsPerPixel</span><span class="pln"> </span><span class="pun">:</span><span class="pln"> </span><span class="lit">32</span><span class="pln">
+</span><span class="typ">Bounds</span><span class="pln">       </span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">X</span><span class="pun">=</span><span style="background-color: #ffffff; color: #ff0000;"><strong><span class="lit">1280</span></strong></span><span class="pun">,</span><span class="pln">Y</span><span class="pun">=</span><span class="lit">0</span><span class="pun">,</span><span class="typ">Width</span><span class="pun">=</span><span class="lit">1024</span><span class="pun">,</span><span class="typ">Height</span><span class="pun">=</span><span class="lit">768</span><span class="pun">}</span><span class="pln">
+</span><span class="typ">DeviceName</span><span class="pln">   </span><span class="pun">:</span><span class="pln"> \\</span><span class="pun">.</span><span class="pln">\DISPLAY2
+</span><span class="typ">Primary</span><span class="pln">      </span><span class="pun">:</span><span class="pln"> </span><span class="kwd">False</span><span class="pln">
+</span><span class="typ">WorkingArea</span><span class="pln">  </span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">X</span><span class="pun">=</span><span class="lit">1280</span><span class="pun">,</span><span class="pln">Y</span><span class="pun">=</span><span class="lit">0</span><span class="pun">,</span><span class="typ">Width</span><span class="pun">=</span><span class="lit">1024</span><span class="pun">,</span><span class="typ">Height</span><span class="pun">=</span><span class="lit">768</span><span class="pun">}</span></pre>
+<p style="text-align: justify;">&nbsp;В итоге изменнёные строки будут выглядеть так (в зависимости от главного монитора знак смещения может быть и отрицательным):</p>
+<pre><span>$FromImage.copyfromscreen(<span style="color: #ff0000;"><strong>1280</strong></span>,0,0,0, $Size,</span><br /><span>([System.Drawing.CopyPixelOperation]::SourceCopy))</span></pre>
+<p style="text-align: justify;">&nbsp;Далее прячем этот скрипт на компьютере или в сети.... Логинимся учётной записью вашего ребёнка. Создаём задачу в пранировщике задач на запуск скрипта VBS при логине данного пользователя:</p>
+<pre style="text-align: justify;"><span class="kwd">set</span><span class="pln"> shell </span><span class="pun">=</span><span class="pln"> wscript</span><span class="pun">.</span><span class="pln">createobject</span><span class="pun">(</span><span class="str">"wscript.shell"</span><span class="pun">)<br /></span><span class="pln">shell</span><span class="pun">.</span><span class="pln">run </span><span class="str">"powershell -file C:\yourpath\yourscript.ps1"</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="kwd">false</span></pre>
+<p style="text-align: justify;">Где yourscript.ps1 ваш скрипт PowerShell. Скрипт VBS нужен для отключения "мерцания" окна PowerShell во время запуска ps1 скрипта. Готово. Указав интервал повторения задачи каждые Х минут (минимальный интервал 1 минута) у вас будут принтскрины экрана во время работы вашего ребёнка. Если вы используете AnvirTaskMаnager, то во время создания задания он предупредит о создании нового задания в автозагрузке.</p>
+<p style="text-align: justify;">&nbsp;</p>
+<p style="text-align: justify;"><span style="color: #ff0000;"><em>Внимание: возможно данные действия нельзя применять в корпоративных средах, т.к. возможны нарушения закона по охране личной жизни и т.д. и т.п.. С другой стороны - какая личная жизнь во время работы?</em></span></p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p style="text-align: center;">&nbsp;<strong>Двухфакторная аутентификация VPN подключения по протоколу SSTP с использованием Смарт Карты.</strong><br /><strong>&nbsp;Zwei-Faktor-Authentisierung von VPN-Verbindungen nach SSTP-Protokoll mit Smart Cards.</strong><br /><strong>&nbsp;Two-factor authentication of VPN connections for SSTP protocol using Smart Cards.</strong></p>
+<p style="text-align: justify;">&nbsp;Да, именно так. Чтобы гугл знал такой запрос на нескольких языках для Windows Server <strong>2012 R2</strong>. И так поехали.<br />&nbsp;Начнём с подготовки сертификатов, которые для смарт карт простые пользователи запрашивать не могут, да им это и не требуется. Уже настроенная Смарт Карта должна быть доставлена конечному пользователю.&nbsp;&nbsp;&nbsp;Для SSTP VPN необходимо опубликовать список отозванных сертификатов CRL. Настройка <a href="https://rmamyshev.wordpress.com/2014/08/15/crl-certificate-revocation-list/#comment-146" target="_blank" rel="noopener noreferrer">описана в данной статье</a>.&nbsp;В идеальном случае создаётся отдельная учётная запись, к примеру, CA Agent, с правом входа только на DC, CA и специально выделенный компьютер или ноутбук, который можно хранить в сейфе. В&nbsp;моём случае этот компьютер должен иметь&nbsp;<a href="http://fs.exonix.ru/network/SSTP/sstp14.png">Windows 8.1</a>, т.к. Windows 10 не видела&nbsp;Смарт Карту eToken 5100 от Gemalto (это решается установкой программы <a href="http://fs.exonix.ru/network/SSTP/token1.png">от Gemalto без драйверов</a>).&nbsp;Пользователю CA Agent&nbsp;разрешается две копии шаблонов:<br /><strong>&nbsp;- Enrollment Agent</strong><br /><strong>&nbsp;- Smartcard Logon</strong></p>
+<p style="text-align: justify;">&nbsp;Если использование Смарт Карт не планируется, тогда используется только один сертификат: <strong>User</strong>.</p>
+<p><img width="626" height="692" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/network/SSTP/sstp1.png" /></p>
+<p>&nbsp;В свойствах Smartcard Logon явно указывается провайдер для Smart Card:</p>
+<p><img width="833" height="568" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/network/SSTP/sstp2.png" /></p>
+<p>&nbsp;Далее на сервере NPS создаётся политика для подключения по SSTP и аутентификации на смарт картах:</p>
+<p><img width="841" height="639" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/network/SSTP/sstp21.png" /></p>
+<p>И сразу покажу пример настройки клиента Windows 10:<br /><img width="525" height="794" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp18.png" caption="false" /></p>
+<p><img width="965" height="691" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/network/SSTP/sstp22.png" /></p>
+<p style="text-align: justify;">&nbsp;А теперь самое интересное: выпуск сертификатов и импорт в карту. На самом деле всё оказалось просто. Для начала надо установить SafeNet Authentication Client, который можно запросить к примеру <a href="http://www.aladdin-rd.ru/support/downloads/etoken/" target="_blank" rel="noopener noreferrer">тут</a>, если вдруг на диске, который пришёл вместе с токеном, оказалась старая версия. У меня так и было, и клиент не устанавливался на OS X (это вообще отдельная тема...).</p>
+<p><img width="957" height="802" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp3.png" caption="false" /></p>
+<p><img width="957" height="751" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp4.png" caption="false" /></p>
+<p><strong>&nbsp;Задаём PIN код для смарт карты:</strong></p>
+<p><img width="637" height="616" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp5.png" caption="false" /></p>
+<p>А далее начинаем работать с оснасткой сертификаты (пользователь):</p>
+<p><img width="841" height="597" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp6.png" caption="false" /></p>
+<p>&nbsp;Для начала запросим сертификат для CA Agent:</p>
+<p><img width="661" height="440" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp7.png" caption="false" /></p>
+<p><img width="786" height="576" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp8.png" caption="false" /></p>
+<p style="text-align: justify;">Далее (<span style="color: #ff0000;">внимание!</span>), запросим сертификат для пользователя. Делается это именно в оснастке сертификатов! В веб-интерфейсе CA 2012 R2 такой возможности больше нет.</p>
+<p><img width="984" height="344" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp9.png" caption="false" /></p>
+<p><img width="785" height="579" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp10.png" caption="false" /></p>
+<p><img width="785" height="576" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp11.png" caption="false" /></p>
+<p>&nbsp;Выбираем поиск в домене и доменного пользователя, для которого запрашиваем сертификат:</p>
+<p><img width="785" height="577" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp12.png" caption="false" /></p>
+<p><img width="786" height="576" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp13.png" caption="false" /></p>
+<p><img width="643" height="473" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp15.png" caption="false" /></p>
+<p>Вводим <strong>PIN</strong> от смарт карты и импортируем сертификат в неё. При этом в оснастке так же будет копия этого сертификата:</p>
+<p><img width="647" height="477" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp16.png" caption="false" /></p>
+<p><img width="643" height="473" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp17.png" caption="false" /></p>
+<p>&nbsp;Подключаемся по VPN, вводим PIN - работаем!</p>
+<p><img width="852" height="404" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp19.png" caption="false" /></p>
+<p><img width="576" height="152" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/network/SSTP/sstp20.png" caption="false" /></p>
+<p></p>
+<p style="text-align: right;"><em>06.09.2016</em></p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+<div id="fb-root"></div>
+<script>// <![CDATA[
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v2.8";
+  fjs.parentNode.insertBefore(js, fjs);
+ }(document, 'script', 'facebook-jssdk'));
+// ]]></script>
+<div class="fb-comments" data-href="http://exonix.ru/#!%D0%A1%D1%82%D0%B0%D1%82%D1%8C%D0%B8/Windows_Server/SSTP_SmartCard/" data-width="670" data-numposts="20"></div>
+</body>
+</html>

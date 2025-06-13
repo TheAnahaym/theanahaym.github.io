@@ -1,0 +1,30 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.Lightsquid_-_Free-sa">Lightsquid - Free-sa</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.AD_2008_-_NTLM_-_Squid_2'7">AD 2008 - NTLM - Squid 2.7</a></li>
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.AD_2008_R2_(2012)_-_Kerberos_-_Squid_3'1">AD 2008 R2 (2012) - Kerberos - Squid 3.1</a></li>
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.Установка_sams_2_RC1">Установка SAMS 2 RC1</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p style="text-align: justify;">&nbsp;Самый простой способ для анализа логов Squid - <a target="_blank" rel="noopener" href="http://lightsquid.sourceforge.net/">lightsquid</a>. На официальном сайте можно найти всё документацию по установке и настройке. Однако, моя система отличается от той, что используется в официальной документации. Отличается лишь путями в конфигурационных файлах. Я не использую путь /var/www/<strong><span style="color: #800000;">htdocs</span></strong>/ - это путь в BSD системах. Соответственно, его нужно исправить в файлах lightsquid.cfg и /etc/apache2/httpd.conf. Так же, нужно указать правильный путь к логам Squid. Для squid<span style="color: #800000;"><strong>3 </strong></span>это&nbsp;/etc/squid<span style="color: #800000;"><strong>3</strong></span>/access.log. В моём случае (сквид с авторизацией, только статистика сайтов) дополнительно рассказывать о lightsquid нет необходимости. Если вы <strong>не</strong> используете авторизацию, то вам нужно прочитать статью о переводе <a target="_blank" rel="noopener" href="http://lightsquid.sourceforge.net/Ip2Name.html">IP в имена</a>.</p>
+<p style="text-align: justify;">&nbsp;&nbsp;Следующий анализатор логов - <a target="_blank" rel="noopener" href="http://free-sa.sourceforge.net/">Free-sa</a>. &nbsp;Об его установке я расскажу подробнее, т.к. я использую 64 битную систему, а для неё есть некоторые особенности. Правда уже есть решение - <span style="color: #ff0000;"><strong>смотрите ниже</strong></span> и возможно эти строки остануться только для информации. Рекомендую уже сейчас предворительно установить Debian x32 (или ваш Linux) на виртуальной машине. Он нам понадобится. Последняя стабильная версия 1.6 была в 2009 году. Но в начале 2012 года было 4 <a target="_blank" rel="noopener" href="http://sourceforge.net/projects/free-sa/files/free-sa-dev/">обновления</a> версии 2.0. Её и будем устанавливать, предворительно установив make, gcc. Скачиваем дистрибутив и читаем файл:</p>
+<p style="text-align: justify;">Edit global.mk file to set your operating system profile via special OSTYPE&nbsp;variable and then type:</p>
+<pre style="text-align: justify;">make install # to compile and install<br>make # to compile only<br>make release # to compile and strip binaries</pre>
+<p style="text-align: justify;">Для Debian в файле global.km раскомментриуем строку&nbsp;<strong>#</strong>OSTYPE = ubuntu-i586-gcc4.</p>
+<p style="text-align: justify;">И закомментируем&nbsp;OSTYPE = generic-any-cc.</p>
+<p style="text-align: justify;">Об особенностях в х64. Во время компиляции можно увидеть следущую ошибку:</p>
+<pre>gcc -I. -I.. -O4 -pipe -march=i586 -fomit-frame-pointer -std=c99 -W -Wall -Wextra -Wredundant-decls -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual -Wreturn-type -Wswitch -Wshadow -Wcast-align -Wuninitialized -Wchar-subscripts -Wuninitialized -Wbad-function-cast -Wwrite-strings -c -o l_squid_native.o l_squid_native.c<br>l_squid_native.c:1: error: CPU you selected does not support x86-64 instruction set<br>l_squid_native.c:1: error: CPU you selected does not support x86-64 instruction set<br>make[2]: *** [l_squid_native.o] Error 1<br>make[2]: Leaving directory `/root/free-sa-2.0.0b5p7/src/logformats'<br>make[1]: *** [logformats/l_cgp_native.o] Error 2</pre>
+<p style="text-align: justify;">Собственно после этого:</p>
+<pre><span>root@proxy-test:~# whereis free-sa</span><br><span>free-sa: /etc/free-sa /usr/share/free-sa /usr/share/man/man1/free-sa.1</span></pre>
+<p style="text-align: justify;">В то время как в х32:</p>
+<pre><span>root@debian-32:~# whereis free-sa</span><br><span>free-sa:&nbsp;</span><span><strong>/usr/bin/free-sa</strong></span><span>&nbsp;/etc/free-sa /usr/share/free-sa /usr/share/man/man1/free-sa.1</span></pre>
+<p style="text-align: justify;">Копируем файл&nbsp;<strong style="color: #800000;">/usr/bin/free-sa </strong>с сервера на сервер. Дераем исполняемым:&nbsp;chmod +x /usr/bin/free-sa Проверяем:</p>
+<pre><span>root@proxy-test:~# whereis free-sa</span><br><span>free-sa:&nbsp;</span><span><strong>/usr/bin/free-sa</strong></span><span>&nbsp;/etc/free-sa /usr/share/free-sa /usr/share/man/man1/free-sa.1</span></pre>
+<p style="text-align: justify;">Всё на месте. Другого решения пока не нашёл. Дальше - настройка конфигурационного файла free-sa.conf. Т.к. я использую squid 3, то правим путь к его логам:&nbsp;log_file="/var/log/squid<span style="color: #800000;"><strong>3</strong></span>/access.log" . Запускаем free-sa и смотрим статистику.</p>
+<p style="text-align: justify;">Ну вот, пока писал статью, <a target="_blank" rel="noopener" href="http://www.opennet.ru/openforum/vsluhforumID3/37681.html#358">разработчик дал</a> <strong><span style="color: #ff0000;">решение этой ситуации</span></strong><span style="color: #ff0000;">:</span></p>
+<p style="text-align: justify;">1) копируем&nbsp;configs/ubuntu-i586-gcc4.mk в&nbsp;configs/ubuntu-x86_64-gcc4.mk</p>
+<p style="text-align: justify;">2)&nbsp;OSTYPE = ubuntu-x86_64-gcc4 в global.mk</p>
+<p style="text-align: justify;">3)&nbsp;В новом configs/ubuntu-x86_64-gcc4.mk замените -march=$(SARCH) на -march=native</p>

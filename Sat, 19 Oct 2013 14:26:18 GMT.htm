@@ -1,0 +1,34 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012_R2.Создание_виртуальной_машины">Создание виртуальной машины</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012_R2">Hyper-V 2012 R2</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012_R2.Экспорт_и_импорт_ВМ">Экспорт и импорт ВМ</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;<br><br></p>
+<p>&nbsp;Создание и настройка новой виртуальной машины немного отличается от <a href="http://exonix.ru/#!Статьи.Windows_Server_Services.Hyper-V_2012.Создание_виртуальной_машины">предыдущего описания</a> для Windows Server 2012.</p>
+<p><img height="258" width="536" alt="hv2-5.png" src="1665845879321.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Если сразу нажать Finish, то будет создана ВМ <strong>первого</strong> поколения.</p>
+<p><img height="540" width="718" alt="hv2-6.png" src="1665845879323.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span>Выбираем название нашей ВМ. Если нужно, можем выбрать место хранения конфигурационных файлов.</span></p>
+<p><img height="540" width="718" alt="hv2-7.png" src="1665845879325.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Выбираем поколение ВМ: первое или второе. Собственно, здесь и написано какие гостевые ОС поддерживаются для второго поколения ВМ. С Unix-like пока не тестировал. После выбора поколения ВМ его нельзя будет изменить.</p>
+<p><img height="540" width="718" alt="hv2-8.png" src="1665845879327.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span>Выделяем объём для оперативной памяти для ВМ, в соответствии с требованиями к устанавливаемой ОС.</span></p>
+<p><img height="540" width="718" alt="hv2-9.png" src="1665845879329.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span>Выбираем тип сетевой карты. У ВМ второго поколения нет Legacy Network Adapter.</span></p>
+<p><img height="540" width="718" alt="hv2-10.png" src="1665845879331.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span>Создаём жёсткий диск и выбираем его размер. Можно использовать уже имеющийся файл с образом системы. Не wim, а vhdx.</span></p>
+<p><img height="540" width="718" alt="hv2-11.png" src="1665845879333.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span>&nbsp;Можно подключить установочный диск, или выполнить это позже. Установка <strong><span style="color: #ff0000;">не</span> может</strong> производится <strong>с</strong> хостового <strong>оптического привода</strong>. Если выбрать "установка ОС позже", то в созданной ВМ будет отсутствовать DVD-ROM и загрузка по умолчанию будет через сеть.<br></span></p>
+<p><img height="540" width="718" alt="hv2-12.png" src="1665845879335.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="540" width="718" alt="hv2-13.png" src="1665845879337.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Далее заходим в свойства новой ВМ и добавляем процессорной мощности в зависимости от выполняемых ролей на ВМ.</p>
+<p><img height="694" width="736" alt="hv2-14.png" src="1665845879339.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;При попытке установки Windows Server 2008 R2 мы увидим следующее ниже сообщение. Как интересно, Microsoft Hyper-V &nbsp;не доверяет Microsoft OS. Отключение Secure Boot не поможет.</p>
+<p style="text-align: right;"><img height="768" width="1024" alt="hv2.png" src="1665845879341.png" style="display: block; margin-left: auto; margin-right: auto;"><em>19.10.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

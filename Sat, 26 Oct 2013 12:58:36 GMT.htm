@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>&nbsp;В данной статье будет рассказано об установке роли Контроллера домена в новом лесу и её первоначальной настройки на операционной системе Window Server 2012 R2. Процесс не отличается от <a href="#!Статьи.Архив.Контроллер_домена_2012">предыдущих версий ОС</a>.</p>
+<p><span>Исходные данные:</span><br /><span>- Хостовой сервер: Intel 2700,&nbsp;</span><strong>16</strong><span>&nbsp;GB RAM, ATI 4550, Windows Server 2012 R2 Eval.</span><br /><span>- Гостевой сервер:&nbsp;Intel 2700 x4,&nbsp;</span><strong>2</strong><span>&nbsp;GB RAM, ATI 4550. x4 для гостевого означает, что добавлено 4 виртуальных процессора.</span><br /><span>- Сетевые настройки гостевого сервера: <strong>статический</strong> адрес, ДНС указывает на мой корпоративный контроллер домена.</span></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad1.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad2.png" /></p>
+<p>&nbsp;В панели Управление Сервером (Server Manager) выбираем Добавить роли и компоненты (Add Roles and Features).</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad3.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad4.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad5.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad6.png" /></p>
+<p>&nbsp;Среди списка ролей сервера выбираем нужную роль Active Directory Domain Services и добавляем все предложенные компонеты.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad7.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad8.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad9.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad10.png" /></p>
+<p>&nbsp;После устровки роли AD DS выбираем Promote this server to a domain comtroller.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad11.png" /></p>
+<p>&nbsp;Выбираем имя для вашего домена в новом лесу. Не рекомендую использовать публичные домены верхнего уровня для внутреннего домена Active Directory.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad12.png" /></p>
+<p>&nbsp;Выбираем уровни функционирования леса и домена. Назначаем пароль для режима восстановления службы каталогов.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad13.png" /></p>
+<p>&nbsp;Как и в предыдущих ОС служба ДНС устанавливается во время настройки AD, поэтому делегирование зоны пока ещё не возможно.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad14.png" /></p>
+<p>&nbsp;Имя NETBIOS оставляем без изменения.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad15.png" /></p>
+<p>&nbsp;Папки хранения базы данных, логов и системного тома оставляем без изменения.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad16.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad17.png" /></p>
+<p>&nbsp;После проверки возможности установки контроллера домена нажимаем Install.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad18.png" /></p>
+<p>&nbsp;После перезагрузки используем учётные данные локального пользователя, который был перемещён в домен и стал доменным пользователем.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad19.png" /></p>
+<p>&nbsp;Приступаем к настройке ДНС сервера. В серверах пересылки указан адрес, который был назначен сетевой карте в поле ДНС до установки роли AD DS. В серверах пересылки можно указать ДНС сервера провайдера или любые другие ДНС сервера, например от Google 8.8.8.8</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad20.png" /></p>
+<p>&nbsp;Создаём обратную зону ДНС для записи в неё PTR-записей.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad21.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad22.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad23.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad24.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad25.png" /></p>
+<p>&nbsp;Разрешаем только безопасные обновления обратной зоны, чтобы её могли менять только клиенты домена.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad26.png" /></p>
+<p>&nbsp;В оснастке Active Directory Сайты и Службы необходимо определить сеть, которую обслуживает наш домен.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad27.png" /></p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad28.png" /></p>
+<p>&nbsp;Меняем порядок ДНС серверов указанных в настройках сетевой карты.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad29.png" /></p>
+<p>&nbsp;На этом настройка контроллера домена на ОС Windows Server 2012 R2 завершена.</p>
+<p><img width="1024" height="768" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2012R2/ad30.png" /></p>
+<p style="text-align: right;"><em>26.10.2013</em></p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+</body>
+</html>

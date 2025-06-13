@@ -1,0 +1,38 @@
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Железо.Тестирование_RAID">Тестирование RAID</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-0_2_диска">RAID-0 2 диска</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-0_4_диска">RAID-0 4 диска</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-1">RAID-1</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-5">RAID-5</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-10">RAID-10</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.Выводы">Выводы</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;"><strong>Пока не могу сформулировать выводы, так как немогу понять некоторые закономерности для RAID-5.&nbsp;</strong></p>
+<p style="text-align: justify;">В тестировании участвовал <a href="#!Статьи.Железо.Устройство_Компьютера">компьютер</a> следующей конфигурации:</p>
+<p style="text-align: justify;">GIGABYTE GA-Z87-DS3H<br />Intel Core i7 4770<br />Kingston KHX13C9B1K2/<strong>16</strong> HyperX Blue<br />Western Digital WD10EZEX Blue <strong>1</strong>TB<br />Windows Server 2012 R2</p>
+<p style="text-align: justify;">&nbsp;Чип Intel z87 содержит raid контроллер, позволяющий создовать raid уровней 0, 1, 5 и 0+1. Другой способ создания raid - средствами операционной системы Windows Server 2012 R2. Данный метод позволяет создовать только raid 0, 1 и 5. И последний способ - с помощью роли File and Storage Services, которая позволяла создавать raid уровней 0, 1, 5 и 0+1. Тестирование производилось следующими бенчмарками: ATTO Benchmart и CrystalDiskMark со значениями почти по умолчанию. <span>Диапазон тестирования программой ATTO был выбран от 4 КБ, так как Storage Spaces отказывались работать с меньшим значением.<span>&nbsp;Все тесты проводятся в следующем порядке - чип, ОС, Storage Spaces. Диски обозначались&nbsp;</span><strong>Z</strong><span>&nbsp;- чип,&nbsp;</span><strong>W</strong><span>&nbsp;- ОС,&nbsp;</span><strong>S</strong><span>&nbsp;-&nbsp;</span><span>Storage Spaces.&nbsp;<span>Для начала приведу результаты тестирования одтельных дисков WD, и для сравнения одного диска SSD.</span></span></span></p>
+<p style="text-align: justify;"><img src="http://fs.exonix.ru/hardware/raid/wd1.png" height="588" width="460" />&nbsp;<img src="http://fs.exonix.ru/hardware/raid/wd2.png" height="588" width="460" /></p>
+<p style="text-align: justify;"><img src="http://fs.exonix.ru/hardware/raid/wd3.png" height="588" width="460" />&nbsp;<img src="http://fs.exonix.ru/hardware/raid/wd4.png" height="588" width="460" /></p>
+<p style="text-align: justify;">&nbsp;Средние значения чтения и записи (<em>значения в KB</em>):</p>
+<pre style="text-align: justify;">чтение 4к	запись 4к	чтение 512к	запись 512к	чтение 8м	запись 8м<br />111187		108413		187833		165291		189977		165396</pre>
+<p style="text-align: justify;">&nbsp;<strong>4к</strong> соответствует маленьким файлам<br /><strong>&nbsp;512к</strong> - средним офисным файлам<br /><strong>&nbsp;8м</strong> - большим файлам</p>
+<p style="text-align: justify;"><img src="http://fs.exonix.ru/hardware/raid/wd5.png" alt="" height="379" width="416" />&nbsp;<img src="http://fs.exonix.ru/hardware/raid/wd6.png" alt="" height="379" width="416" /></p>
+<p style="text-align: justify;"><img src="http://fs.exonix.ru/hardware/raid/wd7.png" alt="" height="379" width="416" />&nbsp;<img src="http://fs.exonix.ru/hardware/raid/wd8.png" alt="" height="379" width="416" /></p>
+<p style="text-align: justify;"><span>&nbsp;Средние значения чтения и записи:</span></p>
+<pre style="text-align: justify;"><span>чтение Seq запись Seq	чтение 512 запись 512	чтение 4К	запись 4К	чтение 4КQD32	запись 4КQD32<br />191	   181		62	   78		0,71		1,96		2,12		1,89
+</span></pre>
+<p><strong>Seq</strong> соответсвует большим файлам, например iso, vhdx<br /><strong>512K</strong> соответствует обычным офисным документам<br /><strong>4K</strong> соответствует мелким файлам, к примеру, веб сервера<br /><strong>4K QD32</strong> - пока не понял что означает (<br /><span style="font-family: sans-serif;"><span style="font-family: sans-serif;"><br />&nbsp;Как видно из тестов, первый диск показал немного большую скорость чтения и записи. А теперь пример тестов SSD диска&nbsp;Crucial CT240M500SSD1, из которого видно, что размеры файлов меньше влияют на скорости.</span></span></p>
+<p style="text-align: justify;"><img src="http://fs.exonix.ru/hardware/raid/ssd2.png" alt="" height="587" width="460" />&nbsp;<img src="http://fs.exonix.ru/hardware/raid/ssd1.png" alt="" height="378" width="416" /></p>
+<p style="text-align: justify;">&nbsp;Тесты для отдельных дисков проводились только раз. А для тестрирования RAID использовалось по три измерения для того, чтобы уменьшить погрешность измерений. В целях экономии размера веб-страницы я буду демонстрировать только одно из трёх измерений. В конце статьи будет таблица усреднённых результатов теста.</p>
+<p style="text-align: justify;">&nbsp;Некоторый RAID массивы требуют синхронизацию дисков для соответствия идентичной информации на них. Это raid 1 и 5, а также 0+1. Во время тестов было выявлено, что непровернные диски имеют меньшую скорость. Однако, данное правило касается только raid на основе чипа и операционной системы. Для Storage Spaces пока даже не получилось выяснить возможность верификации, если она и существует.</p>
+<p style="text-align: justify;">&nbsp;<img src="http://fs.exonix.ru/hardware/raid/sync1.png" alt="" height="601" width="960" /></p>
+<p style="text-align: justify;"><img src="http://fs.exonix.ru/hardware/raid/sync2.png" alt="" height="693" width="960" /></p>
+<p style="text-align: justify;"></p>
+<p style="text-align: right;"><em>12.01.2014</em></p>

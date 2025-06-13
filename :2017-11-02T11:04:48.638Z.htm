@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>Microsoft Message Analyzer:</p>
+<p>&nbsp;</p>
+<p>Cisco:</p>
+<pre><span>(config)#ip access-list extended 102&nbsp;</span><br /><span>(config-ext-nacl)#permit tcp host&nbsp;</span><span>external.cisco.ip.address</span><span>&nbsp;eq 80&nbsp;</span><span>remote.network.range</span><span>&nbsp;0.0.0.255 eq 80&nbsp;</span><br /><span>(config-ext-nacl)#deny tcp any host&nbsp;</span><span>external.cisco.ip.address</span><span>&nbsp;eq www&nbsp;</span><br /><span>(config-ext-nacl)#permit ip any any&nbsp;</span><br /><span>(config-ext-nacl)#exit&nbsp;</span><br /><span>(config)#ip nat inside source static tcp&nbsp;</span><span>dmz.server.ip.address</span><span>&nbsp;80 interface Dialer0 80&nbsp;</span><br /><span>(config)#interface Dialer0&nbsp;</span><br /><span>(config-if)#ip access-group 102 in&nbsp;</span><br /><span>(config-if)#end&nbsp;</span><br /><span>wr<br /></span></pre>
+<p><span>%Static entry in use, cannot remove:</span></p>
+<pre><span>sh ip nat translations udp<br />clear ip nat translation udp inside WAN.IP.ADDRESS 4500 10.254.1.8 4500 outside 10.254.1.8 4500 REMOTE.IP.ADDRESS 4500</span></pre>
+</body>
+</html>

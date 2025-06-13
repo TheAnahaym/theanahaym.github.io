@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>&nbsp;Процесс установки Debian 8 незначительно отличается от установки Debian 7, но тем не менее я решил написать краткую статью по установке Debian 8.</p>
+<p><img src="http://fs.exonix.ru/linux/deb80.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>К сожалению, пока по невыясненной причине не всегда удавалось запустить загрузку Debian с диска на Hyper-V. Помогал только сброс вируальной машины.</p>
+<p><img src="http://fs.exonix.ru/linux/deb81.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Выбор языка установки:</p>
+<p><img src="http://fs.exonix.ru/linux/deb82.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Выбор географического расположения:</p>
+<p><img src="http://fs.exonix.ru/linux/deb83.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>В моём примере я использовал виртуальную машину с двумя сетевыми картами. Выбираем ту, которая подключена к интернету. После установки оказалось, что вторая карточка никак не настроена, даже не настроена на DHCP. Необходимо дописать файл <a href="http://www.aitishnik.ru/linux02.html" target="_blank" rel="noopener noreferrer">/etc/network/interfaces</a><strong>.</strong></p>
+<p><img src="http://fs.exonix.ru/linux/deb83.1.png" alt="" width="800" height="600" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Ввод имени сервера:</p>
+<p><img src="http://fs.exonix.ru/linux/deb84.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Ввод пароля для root. По умолчанию для рута теперь нет доступа по SSH.</p>
+<p><img src="http://fs.exonix.ru/linux/deb85.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Ввод имени пользователя и его пароля, под которым можно будет входить в систему в т.ч. и по SSH:</p>
+<p><img src="http://fs.exonix.ru/linux/deb86.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Выбор временной зоны. Этого окна не было в Debian 7.</p>
+<p><img src="http://fs.exonix.ru/linux/deb87.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Создание разделов. В данном примере создаю один раздел "/":</p>
+<p><img src="http://fs.exonix.ru/linux/deb88.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb89.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Подтверждаем внесение изменений на жёсткий диск:</p>
+<p><img src="http://fs.exonix.ru/linux/deb810.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Отменяем сканирование DVD на предмет пакетов, так как будем обновлять их по сети из интернета:</p>
+<p><img src="http://fs.exonix.ru/linux/deb811.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Подтвеждение обновления пакетов через интернет, выбор сервера с репозиторием и ввод данных прокси-сервера если таковой имеется:</p>
+<p><img src="http://fs.exonix.ru/linux/deb812.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb813.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Окно выбора компонентов при установке. Как и в предыдущих версиях необходимо выбрать SSH сервер, и отменить опции как принтер и окружение рабочего стола. Вид окна отличается от Debian 7:</p>
+<p><img src="http://fs.exonix.ru/linux/deb814.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Выбор установки загрузчика GRUB и места его расположения. В Debain 7 выбора местоположения не было:</p>
+<p><img src="http://fs.exonix.ru/linux/deb815.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p>Установка завершена:</p>
+<p><img src="http://fs.exonix.ru/linux/deb816.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb817.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p></p>
+<p style="text-align: right;"><em>12.06.2015</em></p>
+</body>
+</html>

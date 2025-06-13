@@ -1,0 +1,55 @@
+<p style="text-align: center;"><strong>Реализация единого входа <a target="_blank" rel="noopener" href="https://msdn.microsoft.com/ru-ru/library/azure/dn441213.aspx">Single Sign On</a>&nbsp;с помощью Active Directory Federation Services</strong>.</p>
+<p style="text-align: justify;">&nbsp;При реализации DirSync с паролем пользователь обязан пройти&nbsp;аутентификацию для получения доступа к ресурсам. В случае с Единым Входом (SSO)&nbsp;аутентификация происходит с помощью служб федерации. В случае если доступ к ресурсам происходит с компьютера подключённого к домену, то&nbsp;аутентификация проходит в автоматическом режиме. Для реализации SSO необходимо реализовать <a href="#!Статьи/Windows_Server/Active_Directory/Office_365_-_DirSync">сценарий DirSync</a>. В случае использования сервера AD FS за NAT, на маршрутизаторе (в моём случае на двух) необходимо пробросить 443 порт на сервер AD FS. Служба федераций помимо использования доверенных сертификатов работает с самоподписанными сертификатми, а так же подписанными недоверенными центрами сертификации. В данно статье будет использоватся третий вариант с доменным центром сертификации.</p>
+<p style="text-align: justify;"><span>&nbsp;Используется&nbsp;следующая </span><strong>демонстрационная</strong><span>&nbsp;IT инфрастуктура, где&nbsp;сервер синхронизации и федераций&nbsp;</span><strong>ADFS1</strong><span> находится за двумя NAT:</span></p>
+<p><img height="204" width="596" alt="adfs00.png" src="1665513729628.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Для начала подготовим сертификат для сервера ADFS1. Для этого необходимо создать копию&nbsp;шаблона&nbsp;<strong>Computer</strong>, в котором указать "supply in request". Без этого параметра имя сертификата, которое будет использоваться для подключения к серверу AD FS из интернета, будет идентично FQDN сервера, а оно в свою очередь может быть не доступно из интернета. Особенно это актуально для доменов Active Directory с непубличными TLD. Возможно использовать Web Application Proxy, но этот случай не будет использоваться в моей статье.</p>
+<p><img height="511" width="983" alt="cert1.png" src="1665513729630.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="550" width="990" alt="cert2.png" src="1665513729632.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="380" width="597" alt="cert3.png" src="1665513729634.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;На сервере AD FS открываем оснастку Сертификаты, и выполняем запрос на новый сертификат. В запросе необходимо выбрать созданный шаблон и заполнить некоторые поля.</p>
+<p><img height="643" width="851" alt="cert4.png" src="1665513729636.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Важным полем является Common Name. Именно оно определяет адрес подключения к серверу. Даже из локальной сети вы сможете подключится к серверу только по двум адресам: указанным в CN и localhost. Никакие другие адреса доступны не будут.</p>
+<p><img height="591" width="837" alt="cert5.png" src="1665513729638.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Во время установки и настройки роли AD FS указываем созданный\купленный сертификат и учётную запись, под которой будет работать служба AD FS, если Служебная учётная запись не была создана.</p>
+<p><img height="685" width="916" alt="adfs15.png" src="1665513729640.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Проверяем AD FS по ссылкам:</p>
+<pre>https://adfs1.exonix.ru/adfs/ls/IdpInitiatedSignon.aspx<br>https://localhost/adfs/ls/IdpInitiatedSignon.aspx<br>https://adfs1/adfs/ls/IdpInitiatedSignon.aspx<br>https://10.10.11.11/adfs/ls/IdpInitiatedSignon.aspx</pre>
+<p>&nbsp;Работать будут только первые две. Пока я не выяснял почему веб-страница недоступна по другим адреса. Но самое главное, что работает первая ссылка, доступная из интернета.</p>
+<p><img height="247" width="736" alt="adfs16.png" src="1665513729642.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="376" width="820" alt="adfs17.png" src="1665513729644.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Далее подключаемся в PowerShell к Office 365 введя учётные данные администратора Office 365:</p>
+<pre>PS C:\&gt; <strong>connect-msolservice</strong></pre>
+<p>&nbsp;Посмотрим федеративные домены:</p>
+<pre>PS C:\&gt; <strong>Get-MsolFederationProperty -DomainName exonix.ru</strong>
+<span style="color: #ff0000;"><strong>Source : ADFS Server<br></strong></span>
+ActiveClientSignInUrl : https://adfs1.exonix.ru/adfs/services/trust/2005/usernamemixed<br>FederationServiceDisplayName : AD FS<br>FederationServiceIdentifier : http://adfs1.exonix.ru/adfs/services/trust<br>FederationMetadataUrl : https://adfs1.exonix.ru/adfs/services/trust/mex<br>PassiveClientSignInUrl : https://adfs1.exonix.ru/adfs/ls/<br>PassiveClientSignOutUrl : https://adfs1.exonix.ru/adfs/ls/<br>TokenSigningCertificate : [Subject]<br> CN=ADFS Signing - adfs1.exonix.ru <br>
+ [Issuer]<br> CN=ADFS Signing - adfs1.exonix.ru <br>
+[Serial Number]<br> 343AA093579EA1B24762BCE2E0396D06<br>
+[Not Before]<br> 14.05.2015 16:59:45<br>
+[Not After]<br> 13.05.2016 16:59:45<br>
+[Thumbprint]<br> 5A914A7D1FEF5A6FF43F9030862082CA194C3221<br>
+NextTokenSigningCertificate :<br>PreferredAuthenticationProtocol :<br>
+<span style="color: #ff0000;"><strong>WARNING: The 'exonix.ru' domain does not exist.</strong></span></pre>
+<p>&nbsp;В первом случае ответил локальный сервер. Во втором случае домен не найден, т.к. домен exonix.ru в Office 365 не является федеративным. Последним шагом как раз и будет конвертация домена в федеративный:</p>
+<pre>PS C:\&gt; <strong>Convert-MsolDomainToFederated -DomainName exonix.ru</strong><br>Successfully updated 'exonix.ru' domain.</pre>
+<p>&nbsp;А затем снова проверим домены:</p>
+<pre>PS C:\&gt; <strong>Get-MsolFederationProperty -DomainName exonix.ru</strong>
+<span style="color: #ff0000;"><strong>Source : ADFS Server</strong></span><br><br>ActiveClientSignInUrl : https://adfs1.exonix.ru/adfs/services/trust/2005/usernamemixed<br>FederationServiceDisplayName : AD FS<br>FederationServiceIdentifier : http://adfs1.exonix.ru/adfs/services/trust<br>FederationMetadataUrl : https://adfs1.exonix.ru/adfs/services/trust/mex<br>PassiveClientSignInUrl : https://adfs1.exonix.ru/adfs/ls/<br>PassiveClientSignOutUrl : https://adfs1.exonix.ru/adfs/ls/<br>TokenSigningCertificate : [Subject]<br> CN=ADFS Signing - adfs1.exonix.ru<br>
+[Issuer]<br> CN=ADFS Signing - adfs1.exonix.ru<br>
+[Serial Number]<br> 343AA093579EA1B24762BCE2E0396D06<br>
+[Not Before]<br> 14.05.2015 16:59:45<br>
+[Not After]<br> 13.05.2016 16:59:45<br>
+[Thumbprint]<br> 5A914A7D1FEF5A6FF43F9030862082CA194C3221<br>
+NextTokenSigningCertificate :<br>PreferredAuthenticationProtocol :<br>
+<span style="color: #ff0000;"><strong>Source : Microsoft Office 365</strong></span><br><br>ActiveClientSignInUrl : https://adfs1.exonix.ru/adfs/services/trust/2005/usernamemixed<br>FederationServiceDisplayName : BERLIN<br>FederationServiceIdentifier : http://adfs1.exonix.ru/adfs/services/trust<br>FederationMetadataUrl : https://adfs1.exonix.ru/adfs/services/trust/mex<br>PassiveClientSignInUrl : https://adfs1.exonix.ru/adfs/ls/<br>PassiveClientSignOutUrl : https://adfs1.exonix.ru/adfs/ls/<br>TokenSigningCertificate : [Subject]<br> CN=ADFS Signing - adfs1.exonix.ru<br>
+[Issuer]<br> CN=ADFS Signing - adfs1.exonix.ru<br>
+[Serial Number]<br> 343AA093579EA1B24762BCE2E0396D06<br>
+[Not Before]<br> 14.05.2015 16:59:45<br>
+[Not After]<br> 13.05.2016 16:59:45<br>
+[Thumbprint]<br> 5A914A7D1FEF5A6FF43F9030862082CA194C3221<br>
+NextTokenSigningCertificate :<br>PreferredAuthenticationProtocol : WsFed</pre>
+<p style="text-align: justify;">&nbsp;Если честно, я сам удивился, что настройка AD FS такая простая. Лишь немного повозился с сертификатом. На этом всё. Настройка сервера AD FS завершена. При попытке на странице входа в Office 365 пользователя перенаправит на сервер AD FS, где он должен ввести свои данные или они подставятся сами, если компьютер подключен к домену.</p>
+<p><img height="350" width="839" alt="adfs18.png" src="1665513729646.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: right;"><em>14.05.2015</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

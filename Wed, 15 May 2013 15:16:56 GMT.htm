@@ -1,0 +1,32 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.Установка_sams_2_RC1">Установка SAMS 2 RC1</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.AD_2008_-_NTLM_-_Squid_2'7">AD 2008 - NTLM - Squid 2.7</a></li>
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.AD_2008_R2_(2012)_-_Kerberos_-_Squid_3'1">AD 2008 R2 (2012) - Kerberos - Squid 3.1</a></li>
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.Lightsquid_-_Free-sa">Lightsquid - Free-sa</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;Здесь опишу установку SAMS 2 RC1 для squid 2.7. В принципе документация есть и на <a href="http://sams.perm.ru/">сайте</a> разработчика, но моя ориентирована для тех кому нужно сделать копи-паст и степ-бай-степ. Ибо в официальной документации есть список необходимого ПО, а как его ставить - для новичков могут возниктнуть сложности. Единственное, что позволю себе пропустить - это настройку Squid на авторизацию по NTLM. Это есть в предыдущей статье.</p>
+<p style="text-align: justify;">&nbsp;И так, есть тестовый стенд:</p>
+<p style="text-align: justify;">&nbsp;контроллер домена - Windows Server 2008 R2.</p>
+<p style="text-align: justify;">&nbsp;прокси-сервер - Debian 6.0.2 x64</p>
+<p style="text-align: justify;">&nbsp;После настройки Squid, подготовим прокси сервер для установки SAMS 2. Делал в следующем порядке:</p>
+<blockquote>apt-get install php5<br>apt-get install php5-gd<br>apt-get install libgd2-xpm-dev<br>apt-get install mysql-server<br>apt-get install mysql-client<br>apt-get install&nbsp;libmysqlclient-dev<br>apt-get install php5-mysql<br>apt-get install libpcre3-dev<br>apt-get install libtool<br>apt-get install automake<br>apt-get install make<br>apt-get install g++</blockquote>
+<p style="text-align: justify;">&nbsp;Больше ничего не устанавливал. Далее, как в официальной документации. Единственно что я сделал до: скачал архив на виндовую машину, и дважды разархивировал с помощью 7zip. Для тех у кого нет времени искать как разархивировать архив tar.bz2. В официальной документации используется архив tar.gz, а скачивается tar.bz2.</p>
+<p style="margin-left: 40px; text-align: justify;">cd /sams-2/ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;#так называется моя директория, куда я распаковал архив.</p>
+<blockquote>make -f Makefile.cvssh<br>./configure<br>make<br>make install<br>cd /var/www/<br>ln -s /usr/local/share/sams2/ sams2<br>cd /etc/php5/apache2/<br>vi php.ini &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</blockquote>
+<p style="text-align: justify;">включаем <strong>safe_mode = On</strong></p>
+<p style="text-align: justify;">и указываем&nbsp;<strong>safe_mode_exec_dir = /usr/local/share/sams2/bin</strong></p>
+<p style="text-align: justify;">&nbsp;Далее идём в веб-интерфейс. Там создаём базу. Т.е. заполняем всё, что нам предлагаю. В официальной документации сказано по завершении нажать Start SAMS web interface, но у меня эта кнопка не кликабельная. После нажатия Next, вы снова получите сообщение о создании базы. Не пугайтесь:</p>
+<blockquote>vi&nbsp;/usr/local/etc/sams2.conf</blockquote>
+<p style="text-align: justify;">Заполняем:</p>
+<p style="margin-left: 40px; text-align: justify;">; Username for database connection</p>
+<p style="margin-left: 40px; text-align: justify;">DB_USER=sams</p>
+<p style="margin-left: 40px; text-align: justify;">; Password for database connection</p>
+<p style="margin-left: 40px; text-align: justify;">DB_PASSWORD=ваш_пароль</p>
+<p style="text-align: justify;">Далее /etc/init.d/sams2 start</p>
+<p style="text-align: justify;">С установкой всё. Единственное, с чем я ещё не разобрался - не стартует sams2 после перезагрузки. Что ещё правил - авторизацию, там по умолчанию стоит IP. Делал это в веб-интерфейсе. Но об этом (не люблю я "посылать") прочитайте в официальной документации.</p>

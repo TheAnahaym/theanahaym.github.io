@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Windows_Server_Services.PowerShell">PowerShell</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.PowerShell.Аудит_сервера_печати">Аудит сервера печати</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.PowerShell.Printscreen">Printscreen</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>CSV файл:</p>
+<pre>GivenName,Surname,Name,SamAccountNAme,UserPrincipalName,Department,Path,Enabled,Password,PasswordNeverExpires<br />User,Test1,UserTest1,UserTest1,UserTest1@domain.exonix.ru,IT,"OU=Test,DC=DOMAIN,DC=EXONIX,DC=RU",$True,P@ssw0rd,$True</pre>
+<p></p>
+<pre><strong>Import-Csv</strong> C:\Users\user\Desktop\users.csv | % {<strong>New-ADUser</strong> -GivenName $_.GivenName -Surname $_.Surname -Name $_.Name -SamAccountName $_.SamAccountName -UserPrincipalName $_.UserPrincipalName -Department $_.Department -Path $_.Path -Enabled $True -AccountPassword (ConvertTo-SecureString $_.Password -AsPlainText -force) -PasswordNeverExpires $True}</pre>
+<p>&nbsp;Аудит входа по RDP:</p>
+<pre>Get-WinEvent -FilterHashtable @{Logname="Security";<span style="color: #ff0000;">starttime="2017-05-31"</span>;id=4624} | where {$_.Properties[17].Value -eq "C:\Windows\System32\winlogon.exe"} | Foreach {$_.TimeCreated,$_.Properties[5].Value,$_.Properties[18].Value}</pre>
+<pre>Add-KdsRootKey &ndash;EffectiveImmediately<br />New-ADServiceAccount &ndash;Name TestSQLMSA <strong>-RestrictToSingleComputer</strong><br />Add-ADComputerServiceAccount -Identity SCCM1 -ServiceAccount TestSQLMSA<br /><br />Install-ADServiceAccount TestSQLMSA</pre>
+<p>&nbsp;Запрос сертификта в CA и его установка в Windows Server 2016 <strong>Core</strong>:</p>
+<pre>Set-Location 'Cert:\LocalMachine\My'<br />Get-Certificate <strong>-Template</strong> SSTP-VPN -Url ldap:///CN=dc1.domain.com -DnsName VPN4.DOMAIN.COM -CertStoreLocation Cert:\LocalMachine\My</pre>
+<p>&nbsp;Чтение лога в реальном времени по фильтру содержимого:</p>
+<pre>Get-Content C:\Windows\System32\LogFiles\Firewall\pfirewall.log -Tail 50 -wait | select-string "3389"</pre>
+<p>Zabbix + Firewall:</p>
+<pre>Get-Content .\zabbix_agentd.log -Tail 10 &ndash;Wait</pre>
+<pre>New-NetFirewallRule -DisplayName 'Zabbix Ports' -Profile @('Domain', 'Private') -Direction Inbound -Action Allow -Protocol TCP -LocalPort @('10050', '10051')</pre>
+<pre>Set-NetFirewallProfile -All -LogAllowed:true -LogBlocked:true</pre>
+<pre>$Server = get-adgroupmember -Identity "zabbix agent"<br />Foreach ($i in $Server) {<br />xcopy /S "\\ber-wsrv2\BERLIN\scripts\zabbix_agent\bin\win64\*" "\\$($i.name)\C$\zabbix\"<br />Invoke-Command -ComputerName $i.name -ScriptBlock {<br />cd C:\zabbix<br />$FQDN=(Get-WmiObject win32_computersystem).DNSHostName+"."+(Get-WmiObject win32_computersystem).Domain<br /><br />(Get-Content zabbix_agentd.win.conf) | ForEach-Object { $_ -replace "Hostname=Windows host", "Hostname=$FQDN" } | Set-Content zabbix_agentd.win.conf<br />#(Get-Content zabbix_agentd.win.conf) | ForEach-Object { $_ -replace "zabbix_agentd.log", "zabbix\zabbix_agentd.log" } | Set-Content zabbix_agentd.win.conf<br />#(Get-Content zabbix_agentd.win.conf) | ForEach-Object { $_ -replace "Server=127.0.0.1", "Server=10.254.1.100" } | Set-Content zabbix_agentd.win.conf<br />#(Get-Content zabbix_agentd.win.conf) | ForEach-Object { $_ -replace "ServerActive=127.0.0.1", "ServerActive=10.254.1.100" } | Set-Content zabbix_agentd.win.conf<br /><br />.\zabbix_agentd.exe --config zabbix_agentd.win.conf --install<br />.\zabbix_agentd.exe --config zabbix_agentd.win.conf --start<br />}<br />}</pre>
+<pre>Get-ChildItem -Recurse C:\* | where {$_.LastWriteTime -like "*10/09/2017*"}</pre>
+<p>&nbsp;Удалённый импорт шрифтов из общей папки на файловом сервере:</p>
+<pre>$cpu = "ComputerName"<br />Invoke-Command -Computername $cpu -ScriptBlock {mkdir C:\fonts}<br />$s = New-PSSession $cpu<br />Copy-Item -ToSession $s -Path "\\server\scripts\fonts\*" -Destination "C:\fonts\" -Recurse<br /><br />Enter-PSSession $cpu<br />cd C:\fonts\<br />.\fonts.bat<br />exit</pre>
+<pre>get-item wsman:\localhost\Client\TrustedHosts<br />set-item wsman:\localhost\Client\TrustedHosts -value 192.168.1.100<br />Invoke-Command -Computername 192.168.1.100 -ScriptBlock {C:\fonts\fonts.bat} -Credential domain\user</pre>
+<p>&nbsp;Удалённое управление IIS:</p>
+<pre>Add-WindowsFeature Web-Mgmt-Service<br />Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1</pre>
+</body>
+</html>

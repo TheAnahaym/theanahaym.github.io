@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.AD_2008_-_NTLM_-_Squid_2'7">AD 2008 - NTLM - Squid 2.7</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.AD_2008_R2_(2012)_-_Kerberos_-_Squid_3'1">AD 2008 R2 (2012) - Kerberos - Squid 3.1</a></li>
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.Установка_sams_2_RC1">Установка SAMS 2 RC1</a></li>
+<li><a href="#!Статьи.Прокси_сервер_Squid_и_Active_Directory.Lightsquid_-_Free-sa">Lightsquid - Free-sa</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;Тестовый стенд: Windows Server 2008 R2 Hyper-V, VM с Debian 6.0.2, VM с контроллером домена на SBS 2008, VM с клиентом Windows 7. Уровень домена и леса: Windows 2008.<br />Настройка прокси сервера:</p>
+<pre style="text-align: justify;">apt-get update<br />apt-get install winbind<br />vi /etc/samba/smb.conf<br />workgroup = domain &nbsp; &nbsp; #к примеру для домена test.demo пишется только test.<br />security = domain<br />winbind use default domain = yes</pre>
+<p style="text-align: justify;">В файл /etc/hosts добавляем</p>
+<pre><span>ip.address &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dc.test.demo &nbsp; &nbsp; &nbsp; &nbsp; dc</span></pre>
+<p style="text-align: justify;">Добавляем сервер в домен:</p>
+<pre style="text-align: justify;">net rpc join -U domainadmin &nbsp; &nbsp; #domainadmin - учётная запись администратора домена.<br />password:</pre>
+<p style="text-align: justify;">Проверяем:</p>
+<pre style="text-align: justify;">ntlm_auth --username=test &nbsp; &nbsp; #test - любая учётная запись в домене.<br />password:<br />NT_STATUS_OK: Success (0x0)</pre>
+<p style="text-align: justify;">Устанавливаем и настраиваем SQUID:</p>
+<pre style="text-align: justify;">apt-get install squid<br />vi /etc/squid/squid.conf<br /><span>auth_param ntlm program /usr/bin/ntlm_auth --helper-protocol=squid-</span><strong>2.5</strong><span>-ntlmssp &nbsp; &nbsp; #2.5 - это не версия squid.</span><br /><span>acl GROUP_FOR_INTERNET proxy_auth REQUIRED &nbsp; &nbsp; #GROUP_FOR_INTERNET - группа в Active Directory для доступа в интернет.</span><br /><span>http_access allow&nbsp;GROUP_FOR_INTERNET&nbsp;</span></pre>
+<p></p>
+<p style="text-align: justify;">Всё. Порт прокси по умолчанию 3128. При подключении можно смотреть логи:&nbsp;tail -f /var/log/squid/access.log.<br />Не забываем, что NTLMv1 в Windows Vista\7 - <strong>по умолчанию отключен</strong>.</p>
+<p style="text-align: right;"><em>Осень 2011</em></p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+</body>
+</html>

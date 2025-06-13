@@ -1,0 +1,130 @@
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-10">RAID-10</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Железо.Тестирование_RAID">Тестирование RAID</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-0_2_диска">RAID-0 2 диска</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-0_4_диска">RAID-0 4 диска</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-1">RAID-1</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.RAID-5">RAID-5</a></li>
+<li><a href="#!Статьи.Железо.Тестирование_RAID.Выводы">Выводы</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><span><strong>Чип Intel Z87</strong>&nbsp;(<span></span><a href="http://fs.exonix.ru/hardware/raid/b14.1.png">1</a><span>&nbsp;</span><a href="http://fs.exonix.ru/hardware/raid/b14.3.png">2</a><span>&nbsp;</span><a href="http://fs.exonix.ru/hardware/raid/b14.5.png">3</a><span>&nbsp;</span><a href="http://fs.exonix.ru/hardware/raid/b14.6.png">4</a>)</span></p>
+<p><span><img src="http://fs.exonix.ru/hardware/raid/b14.2.png" alt="" height="616" width="482" /> <img src="http://fs.exonix.ru/hardware/raid/b14.4.png" alt="" height="379" width="416" /></span></p>
+<p><span><span>&nbsp;<strong>Storage Spaces</strong>&nbsp;<span>(</span><span></span><a href="http://fs.exonix.ru/hardware/raid/b15.1.png">1</a><span>&nbsp;</span><a href="http://fs.exonix.ru/hardware/raid/b15.3.png">2</a><span>&nbsp;</span><a href="http://fs.exonix.ru/hardware/raid/b15.5.png">3</a><span>&nbsp;</span><a href="http://fs.exonix.ru/hardware/raid/b15.6.png">4</a><span>)</span></span></span></p>
+<p><span><img src="http://fs.exonix.ru/hardware/raid/b15.2.png" alt="" height="616" width="482" /> <img src="http://fs.exonix.ru/hardware/raid/b15.4.png" alt="" height="379" width="416" /></span></p>
+<p><span><span>Результаты raid-10 и процентное соотношение скорости с отдельным диском (<strong>ATTO</strong>):</span></span></p>
+<table height="115" width="629">
+<tbody>
+<tr>
+<td></td>
+<td><em>чтение 8м</em></td>
+<td><em>запись 8м</em></td>
+<td><em>чтение 512к</em></td>
+<td><em>запись 512к</em></td>
+<td><em>чтение 4к</em></td>
+<td><em>запись 4к</em></td>
+</tr>
+<tr>
+<td></td>
+<td>241788</td>
+<td>247908</td>
+<td>171672</td>
+<td>200347</td>
+<td>278181</td>
+<td>79396</td>
+</tr>
+<tr>
+<td><span style="color: #ff0000;">Z</span></td>
+<td><span style="color: #ff0000;">27</span></td>
+<td><span style="color: #ff0000;">50</span></td>
+<td><span style="color: #ff0000;">-9</span></td>
+<td><span style="color: #ff0000;">21</span></td>
+<td><span style="color: #ff0000;">150</span></td>
+<td><span style="color: #ff0000;">-27</span></td>
+</tr>
+<tr>
+<td></td>
+<td>583672</td>
+<td>252977</td>
+<td>258909</td>
+<td>207634</td>
+<td>91938</td>
+<td>87181</td>
+</tr>
+<tr>
+<td><span style="color: #ff0000;">S</span></td>
+<td><span style="color: #ff0000;">207</span></td>
+<td><span style="color: #ff0000;">53</span></td>
+<td><span style="color: #ff0000;">38</span></td>
+<td><span style="color: #ff0000;">26</span></td>
+<td><span style="color: #ff0000;">-17</span></td>
+<td><span style="color: #ff0000;">-20</span></td>
+</tr>
+</tbody>
+</table>
+<p><br /><span style="font-family: sans-serif;">Результаты raid-10 и процентное соотношение скорости с отдельным диском (</span><strong style="font-family: sans-serif;">CrystalDiskMark</strong><span style="font-family: sans-serif;"><span style="font-family: sans-serif;">):</span></span></p>
+<table height="115" width="919">
+<tbody>
+<tr>
+<td></td>
+<td><em>чтение Seq</em></td>
+<td><em>запись Seq</em></td>
+<td><em>чтение 512</em></td>
+<td><em>запись 512</em></td>
+<td><em>чтение 4К</em></td>
+<td><em>запись 4К</em></td>
+<td><em>чтение 4КQD32</em></td>
+<td><em>запись 4КQD32</em></td>
+</tr>
+<tr>
+<td></td>
+<td>165,67</td>
+<td>304,80</td>
+<td>59,59</td>
+<td>92,79</td>
+<td>0,77</td>
+<td>2,89</td>
+<td>6,43</td>
+<td>3,88</td>
+</tr>
+<tr>
+<td><span style="color: #ff0000;">Z</span></td>
+<td><span style="color: #ff0000;">-13</span></td>
+<td><span style="color: #ff0000;">68</span></td>
+<td><span style="color: #ff0000;">-4</span></td>
+<td><span style="color: #ff0000;">19</span></td>
+<td><span style="color: #ff0000;">8</span></td>
+<td><span style="color: #ff0000;">48</span></td>
+<td><span style="color: #ff0000;">203</span></td>
+<td><span style="color: #ff0000;">105</span></td>
+</tr>
+<tr>
+<td></td>
+<td>381,40</td>
+<td>239,40</td>
+<td>65,82</td>
+<td>93,14</td>
+<td>0,77</td>
+<td>2,89</td>
+<td>6,49</td>
+<td>3,58</td>
+</tr>
+<tr>
+<td><span style="color: #ff0000;">S</span></td>
+<td><span style="color: #ff0000;">100</span></td>
+<td><span style="color: #ff0000;">32</span></td>
+<td><span style="color: #ff0000;">6</span></td>
+<td><span style="color: #ff0000;">19</span></td>
+<td><span style="color: #ff0000;">9</span></td>
+<td><span style="color: #ff0000;">48</span></td>
+<td><span style="color: #ff0000;">206</span></td>
+<td><span style="color: #ff0000;">89</span></td>
+</tr>
+</tbody>
+</table>

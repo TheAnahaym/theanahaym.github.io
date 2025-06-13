@@ -1,0 +1,39 @@
+<p style="text-align: center;"><strong> Управление сетями с помощью VLAN на примере Cisco ISR 886 и коммутаторов TP-Link, HP</strong></p>
+<p style="text-align: justify;">&nbsp;Примерная схема сети:</p>
+<p><img height="405" width="549" alt="net3.png" src="1665329145071.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Задача: реализовать корпоративный и гостевой WiFi доступ с помощью VLAN.</p>
+<p>&nbsp;Первым делом необходимо создать VLAN на Cisco. Для Cisco C886VA:</p>
+<pre><strong>conf t<br></strong>(config)#interface <strong>Vlan1</strong><br>(config-if)#description System VLAN #<span style="color: #ff0000;">Это управляющий VLAN, к которому будет подключаться всё оборудование</span><br>(config-if)#ip address 10.254.1.1 255.255.255.0<br>(config-if)#ip mtu 1492<br>(config-if)#ip nbar protocol-discovery ipv4<br>(config-if)#ip flow ingress<br>(config-if)#ip nat inside<br>(config-if)#ip virtual-reassembly in max-reassemblies 64<br><br>(config-if)#<strong>exit</strong><br>(config)#interface Vlan<span style="color: #ff0000;">401</span><br>(config-if)#description LAN<br>(config-if)#ip address 192.168.<span style="color: #ff0000;"><strong>1</strong></span>.1 255.255.255.0<br>(config-if)#ip mtu 1492<br>(config-if)#ip nbar protocol-discovery ipv4<br>(config-if)#ip flow ingress<br>(config-if)#ip nat inside<br>(config-if)#ip virtual-reassembly in max-reassemblies 64<br>(config-if)#exit<br><br>(config)#interface Vlan<span style="color: #00ccff;">402</span><br>(config-if)#description <span style="color: #00ccff;">Guest</span> WiFi<br>(config-if)#ip address 192.168.<span style="color: #00ccff;"><strong>2</strong></span>.1 255.255.255.0<br>(config-if)#ip helper-address 192.168.1.10<br>(config-if)#ip mtu 1492<br>(config-if)#ip nbar protocol-discovery ipv4<br>(config-if)#ip flow ingress<br>(config-if)#ip nat inside<br>(config-if)#ip virtual-reassembly in max-reassemblies 64<br>(config-if)#exit<br><br>(config)#vlan <strong><span style="color: #00ff00;">1</span></strong><br>(config-vlan)#exit<br><br>(config)#vlan <span style="color: #00ccff;">401</span><br>(config-vlan)#exit<br><br>(config)#vlan <span style="color: #ff0000;">402</span><br>(config-vlan)#exit<br><br>(config)#interface FastEthernet0<br>(config-if)#description <strong>Trunk</strong><br>(config-if)#switchport mode <strong>trunk</strong><br>(config-if)#no ip address<br>(config-if)<strong>end</strong><br>#<strong>wr</strong></pre>
+<p>&nbsp;Проверяем наличие VLAN в транке:</p>
+<pre>#<strong>show interfaces trunk</strong><br><br>Port Mode Encapsulation Status Native vlan<br>Fa0 on 802.1q trunking 1<br><br>Port Vlans allowed on trunk<br>Fa0 1-4094<br><br>Port Vlans allowed and active in management domain<br>Fa0 1,401-402<br><br>Port Vlans in spanning tree forwarding state and not pruned<br>Fa0 1,401-402</pre>
+<div>
+<div style="text-align: justify;">&nbsp;</div>
+<div style="text-align: justify;">&nbsp;А теперь начинается самое интересное - настройка <strong>коммутаторов</strong> и точки доступа. Для начала создадим VLAN на коммутаторах:</div>
+<div style="text-align: justify;">&nbsp;</div>
+<div><img height="325" width="901" alt="net4.png" src="1665329145073.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div>&nbsp;</div>
+<div>&nbsp;Назначим транковые порты (<strong>тегированные</strong>): 1 - входящий от Cisco, 4 - исходящий в HPE Switch:</div>
+<div>&nbsp;</div>
+<div><img height="573" width="918" alt="net5.png" src="1665329145075.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div>&nbsp;В итоге будет такая картина на TP-Link:</div>
+<div>&nbsp;</div>
+<div><img height="325" width="901" alt="net6.png" src="1665329145077.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div>&nbsp;</div>
+<div style="text-align: justify;">&nbsp;Теперь "примем" VLAN на коммутаторе HPE. Начнём как всегда с создания (<em>почему-то в Chrome невозможно работать в панели упраления HPE, я использовал FireFox</em>). Настройка отличается от коммутаторов HPE:</div>
+<div>&nbsp;</div>
+<div><img height="658" width="990" alt="net7.png" src="1665329145079.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div>&nbsp;В HPE Транки настриваются по-другому. Первый порт становится членом Транка №1:</div>
+<div>&nbsp;</div>
+<div><img height="838" width="853" alt="net8.png" src="1665329145081.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div>&nbsp;Финальная картина выглядит так. К 6-му порту будет подключена точка доступа.</div>
+<div>&nbsp;</div>
+<div><img alt="" src="http://fs.exonix.ru/cisco/net9.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div style="text-align: justify;">&nbsp;Теперь правильно настроим VLAN на портах HPE. Для этого нужно зайти в VLAN - Port Membership, выбрать нужный VLAN и назначить на портах. Untagget порт это тоже самое, что у Cisco - switch port access vlan 402. Другими словами (<strong>непрофессиональными</strong>), порт принадлежит данному VLAN, и устройство подключенное к этому порту, колучит IP адрес из этого VLAN. 1 и 6 порты настроить нельзя, так как они являются членами Транков. Это означает (снова <strong>непрофессиональное</strong> определение), что устройство подключённое к этому порту так же должно быть настроено на транк<span style="color: #ff0000;"><strong>!</strong></span> Исключение составляет <strong>системный\управляющий</strong> VLAN, по которому обычно и подключают точки доступа. В моём случае VLAN 1 в сети 10.254.1.0.24.</div>
+<div>&nbsp;</div>
+<div><img height="606" width="884" alt="net10.png" src="1665329145083.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div>&nbsp;Теперь настроим точку доступа. Создадим WiFi с соответствующими VLAN. В качестве WiFi мы используем решение от UniFi:</div>
+<div>&nbsp;</div>
+<div><img height="294" width="997" alt="net11.png" src="1665329145085.png" style="display: block; margin-left: auto; margin-right: auto;"></div>
+<div>&nbsp;</div>
+<div style="text-align: justify;">&nbsp;Точка доступа подключается к 6-му порту HPE. Напомню, что тот порт является транковым и прописан в настройках VLAN 401\402 на HPE.</div>
+</div>

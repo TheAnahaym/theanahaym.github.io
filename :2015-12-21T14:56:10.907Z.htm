@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<pre>alias ll="ls -lah"</pre>
+<pre>runuser otrs -c 'perl otrs.Console.pl'</pre>
+<pre>aptitude install apache2 php5-gd libgd2-xpm-dev libapache2-mod-php5 gcc make</pre>
+<pre>perl -MCPAN -e "install Number::Format"</pre>
+<pre>/etc/sysctl.conf<br />net.ipv4.ip_forward=1<br /><br />/etc/rc.local<br />iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</pre>
+<pre>allow-hotplug eth1<br />iface eth1 inet static<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; address 172.16.11.10<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; netmask 255.255.255.0<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; network 172.16.11.0<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; broadcast 172.16.11.255</pre>
+<pre style="font-family: monospace, Courier !important; line-height: 1.3em; background-color: #f9f9f9; color: #3f4042; font-size: 14.4px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: normal; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;">post-up ip route add default via 10.10.0.1 dev eth1 table rt2</pre>
+<p>iptables -t mangle -A PREROUTING -d 172.16.11.101 -j TEE --gateway 172.16.22.22<br />iptables -t mangle -A PREROUTING -s 172.16.11.101 -j TEE --gateway 172.16.22.22<br />tcpdump -l | tee out.log<br />iptables -t mangle -F</p>
+<p>aptitude remove <strong>rdnssd</strong></p>
+<p>iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080</p>
+<p>/usr/sbin/tcpdump&nbsp; -i&nbsp; eth0 -n -nn -ttt 'port 8080'</p>
+<p></p>
+<pre>PS1='${debian_chroot:+($debian_chroot)}\[\033[00;32m\]\u\[\033[00m\]\[\033[00;31m\]@\[\033[00m\]\[\033[00;34m\]\h\[\033[00m\]\[\033[00;31m\]:\[\033[00m\]\[\033[00;33m\]\w\[\033[00m\]# '<br />export LS_OPTIONS='--color=auto'<br />eval "`dircolors`"<br />alias ls='ls $LS_OPTIONS'</pre>
+<p>SET PASSWORD FOR 'root'@'localhost' = PASSWORD('MyNewPass');</p>
+<p>select host,user from mysql.user;</p>
+</body>
+</html>

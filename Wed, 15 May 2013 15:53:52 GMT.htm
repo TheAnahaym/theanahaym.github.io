@@ -1,0 +1,110 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.DNS.Управление_доменной_зоной">Управление доменной зоной</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.DNS">DNS</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;<span style="text-align: justify;">Теперь рассмотрим примеры с созданием новой зоны. К примеру это будет зона vk.com. Все пункты визарда по умолчанию, кроме некоторых. Зону можно хранить в AD, а можно и не хранить в AD. Если хранить, то это обеспечит резервное копирование данной зоны. Возможно, ещё какие плюшки )</span></p>
+<p><img height="768" width="1024" alt="dns10.png" src="1665845879249.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Зоны бывают трёх видов: первичная, вторичная и заглушки. Первичная зона настраивается на одном сервере, и потом распространяется на другие ДНС сервера, где она настроена как вторичная зона. Заглушка - это урезанная первичная зона. Например, если у вас заказана на www.nic.ru услуга Первичный-ДНС, то вы можете не покупать услугу Вторичный-ДНС, а просто указать в делегировании домена свой ДНС как второй и настроить на нём вторичную зону. Если ваш ДНС сервер за NAT - 53 порт прокидываем! Интересно, что будет если внешний домен и AD домен имеют одно название? Надо будет попробовать...</p>
+<p><img height="768" width="1024" alt="dns17.png" src="1665845879251.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="dns11.png" src="1665845879253.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;В данном моменте я запрещаю какие-либо автоматические изменения в новой зоне, чтобы только администратор ДНС сервера мог руками править зону.</p>
+<p><img height="768" width="1024" alt="dns12.png" src="1665845879255.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="dns13.png" src="1665845879257.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Краткое описание часто используемых типов записей в ДНС.</p>
+<p><img height="768" width="1024" alt="dns14.png" src="1665845879259.png" style="text-align: center; display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;- <strong>SOA</strong>&nbsp;указывает, грубо говоря, что "я есть зона". В ней есть некоторая информация, такая как "номер" зоны, время обновления зоны. Создаётся автоматически. Вот как выглядит SOA у YA.RU:&nbsp;</p>
+<blockquote>
+<div>C:\Users\user&gt;nslookup -type=SOA ya.ru</div>
+<div>Server: &nbsp;dc1.domain.local</div>
+<div>Address: &nbsp;192.168.10.10</div>
+<div>&nbsp;</div>
+<div>Non-authoritative answer:</div>
+<div>ya.ru</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; primary name server = ns1.yandex.ru</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; responsible mail addr = sysadmin.yandex.ru</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; serial &nbsp;= 2013041600</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; refresh = 10800 (3 hours)</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; retry &nbsp; = 900 (15 mins)</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; expire &nbsp;= 2592000 (30 days)</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; default TTL = 900 (15 mins)</div>
+<div>&nbsp;</div>
+<div>ns1.yandex.ru &nbsp; internet address = 213.180.193.1</div>
+</blockquote>
+<p style="text-align: justify;">&nbsp;-&nbsp;<strong>NS</strong>&nbsp;указывает какие ДНС сервера отвечают за эту зону. Создаётся автоматически, так же можно добавить в свойствах SOA. Вот как выглядит NS у YA.RU:&nbsp;</p>
+<blockquote>
+<div>C:\Users\user&gt;nslookup -type=NS ya.ru</div>
+<div>Server: &nbsp;dc1.domain.local</div>
+<div>Address: &nbsp;192.168.10.10</div>
+<div>&nbsp;</div>
+<div>Non-authoritative answer:</div>
+<div>ya.ru &nbsp; nameserver = ns2.yandex.ru</div>
+<div>ya.ru &nbsp; nameserver = ns1.yandex.ru</div>
+<div>&nbsp;</div>
+<div>ns2.yandex.ru &nbsp; internet address = 93.158.134.1</div>
+<div>ns1.yandex.ru &nbsp; internet address = 213.180.193.1</div>
+</blockquote>
+<p style="text-align: justify;">&nbsp;-&nbsp;<strong>А</strong>&nbsp;запись (<strong>АААА</strong> для IPv6). Основная запись ДНС, указывающая на IP адрес узла. Nslookup по умолчанию выводит все А записи непосредственной запрашиваемой зоны. Домены третьего уровня и поддомены зоны не узнать, но об этом чуть позже.&nbsp;</p>
+<blockquote>C:\Users\user&gt;nslookup -type=A ya.ru<br>Server: &nbsp;dc1.domain.local<br>Address: &nbsp;192.168.10.10
+<div>Non-authoritative answer:</div>
+<div>Name: &nbsp; &nbsp;ya.ru</div>
+<div>Addresses: &nbsp;87.250.250.203</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 87.250.251.3</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 93.158.134.3</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 93.158.134.203</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 213.180.193.3</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 213.180.204.3</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 77.88.21.3</div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 87.250.250.3</div>
+<div>&nbsp;</div>
+<div>
+<div>C:\Users\user&gt;nslookup -type=<strong>AAAA</strong> google.com</div>
+<div>Server: &nbsp;dc1.domain.local</div>
+<div>Address: &nbsp;192.168.10.10</div>
+<div>&nbsp;</div>
+<div>Non-authoritative answer:</div>
+<div>Name: &nbsp; &nbsp;google.com</div>
+<div>Address: &nbsp;2a00:1450:4008:c01::8b</div>
+</div>
+</blockquote>
+<div style="text-align: justify;">&nbsp;&nbsp;-&nbsp;<strong>CNAME</strong> алиас или псевдоним, и этим всё сказано. Самый распространённый алиас - WWW.<br>&nbsp; -&nbsp;<strong>MX</strong>&nbsp;указывает на того, кто есть почтовый сервер для этого домена:</div>
+<div style="text-align: justify;">
+<blockquote>
+<div>C:\Users\user&gt;nslookup -type=MX ya.ru</div>
+<div>Server: &nbsp;dc1.domain.local</div>
+<div>Address: &nbsp;192.168.10.10</div>
+<div>&nbsp;</div>
+<div>Non-authoritative answer:</div>
+<div>ya.ru &nbsp; MX preference = 10, mail exchanger = mx.yandex.ru</div>
+<div>&nbsp;</div>
+<div>mx.yandex.ru &nbsp; &nbsp;internet address = 213.180.204.89</div>
+<div>mx.yandex.ru &nbsp; &nbsp;internet address = 77.88.21.89</div>
+<div>mx.yandex.ru &nbsp; &nbsp;internet address = 87.250.250.89</div>
+<div>mx.yandex.ru &nbsp; &nbsp;internet address = 93.158.134.89</div>
+<div>mx.yandex.ru &nbsp; &nbsp;internet address = 213.180.193.89</div>
+</blockquote>
+</div>
+<p style="text-align: justify;">&nbsp;- <strong>SRV</strong> ресурсная запись, указывает на ресурсы в сети. Например, указывает кто в домене является ldap каталогом. В записи обязательно должен быть указан порт службы:</p>
+<p><img height="768" width="1024" alt="dns16.png" src="1665845879261.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;<strong>Передача зоны</strong>. По умолчанию выключена, и именно по этому мы не можем узнать домены третьего уровня и поддомены. Если мы включим трансфер для всех серверов - то любой ДНС сервер может скопировать зону и настроить её у меня как вторичная. Можно разрешить трансфер зоны только доменным ДНС серверам или только определённому серверу. Передача зоны нужна, например, при настройке доверительных отношений.</p>
+<p><img height="768" width="1024" alt="dns15.png" src="1665845879263.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp; И так, что стало когда мы создали зону vk.com ? Во-первых для нас ДНС сервер стал авторитарным ДНС сервером. Вот чем опасны подмены ДНС серверов, где могут быть созданы доменные зоны указывающие на вредоносные веб-сайты. Для избежания этого был введён DNSSEC - зона подписывается доверенным сертификатом. Во-вторых мы теперь можем заблокировать vk.com на работе. На скрине nslookup без зоны, с новой зоной VK.COM и с записью типа А указывающей на сервер с установленным IIS 8. Так же видно, что будут получать пользователи при попытке зайти на страницу VK.COM. В IIS можно изменить содержимое (как и в любом веб-сервере) на что-нибудь более значимое для пользователя. Например - на работе работай. П.с. как правило админы не запрещают себе ничего ). Этот способ хорошо подходит для блокировки сайтов тем, у кого нет прокси сервера. Однако, локальные администраторы могут править файл hosts - и вконтакт доступен.</p>
+<p><img height="768" width="1024" alt="dns18.png" src="1665845879265.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;"><em>&nbsp;Респект админам вконтакта - уже поддерживают IPv6!</em>&nbsp;Для сравнения:</p>
+<blockquote>
+<div>C:\Users\user&gt;nslookup -type=AAAA gov.ru</div>
+<div>Server: &nbsp;dc1.domain.local</div>
+<div>Address: &nbsp;192.168.10.10</div>
+<div>&nbsp;</div>
+<div>Name: &nbsp; &nbsp;gov.ru</div>
+</blockquote>
+<div style="text-align: justify;">Ну, я думаю и там всё будет хорошо. На это всё. Спасибо за внимание.</div>
+<p style="text-align: right;"><em>30.04.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

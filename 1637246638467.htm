@@ -1,0 +1,38 @@
+<p style="text-align: center;"><span style="font-size: 24pt;"><strong>Установка и настройка контроллера домена на Windows Server 2022</strong></span></p>
+<p style="text-align: justify;">1 Сентября 2021 года корпорация Microsoft представила миру очередную серверную операционную систему <strong>Windows Server 2022</strong>. Уже давно известно, что Microsoft сконцентрирована на разработке облачных технологий и продуктов, однако "наземный" Active Directory до сих пор является популярной ролью Windows Server. Именно поэтому я традиционно обновляю статью по установке и настройке контроллера домена. Сейчас я уже знаю, что никаких изменений в Active Directory не было сделано и именно это и хочется продемонстрировать.</p>
+<p style="text-align: justify;">Исходные данные:</p>
+<p><img src="1637246638472/1.jpg" title="1.jpg" width="1024" height="576" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Установку буду выполнять в графике, так будет проще продемонстрировать отсутствие изменений:</p>
+<p><img src="1637246638474/2.jpg" title="2.jpg" width="1024" height="525" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Выбираем роль Active Directory Domain Services и выполняем все шаги с настройками по умолчанию:</p>
+<p><img src="1637246638476/3.jpg" title="3.jpg" width="1024" height="681" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Повышаем уровень сервера до контроллера домена:</p>
+<p><img src="1637246638478/4.jpg" title="4.jpg" width="982" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Выбор имени домена. Одна из самых обсуждаемых тем у системных администраторов. Лично я считаю, что имя должно быть доменом третьего уровня, при этом третий уровень будет повторять главное имя домена. Такое имя сразу решает две проблемы:<br>- корпоративный веб-сайт уже не будет совпадать с именем AD Домена<br>- логины пользователей будут использовать такое же NetBIOS имя, как и наименование компании. Никаких CORP и прочего. Когда пользователь будет логиниться, то он всегда будет видеть в какой компании он работает. Единственный вариант, при котором можно отойти от этого правила, если устанавливается дочерний домен (не контроллер, а целый дочерний домен) в филиале. Например, если у вашей корпорации есть два филиала, к примеру, в Италии и Германии, то домены можно назвать it.company.com и de.company.com. Тоже самое для других городов, где требуется отдельный дочерний домен: msk.company.ru и spb.company.ru.</p>
+<p><img src="1637246638484/5.jpg" title="5.jpg" width="951" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>А вот и шаг, где я ожидал самые главные изменения в Windows Server 2022. Увы, ни уровень домена, ни уровень леса не получили никакого развития, а всё так осталось на уровне 2016 года... Печально... С другой стороны, можно будет попробовать установить в этом домене почтовый сервере Exchange 2019, которые официально еще (Ноябрь 2021) не поддерживает контроллеры домена 2022.</p>
+<p><img src="1637246638480/6.jpg" title="6.jpg" width="951" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Ещё один важный шаг - пожалуйста, не меняйте NetBIOS имя! Это очень критично для компаний, которые имеют какие-либо доверительные отношения с другими компаниями. Так, например на моём опыте, после включения пользователя в группу Protected Users, пользователь перестал логиниться на сервере домена B со своего компьютера в домена А используя привычное логон имя <strong>B</strong>\username. Теперь ему приходится использовать полное имя <a href="mailto:username@corp.domain.com">username@corp.domain.com </a>Как видите, FQDN corp.domain.com, a NetBIOS имя было изменено на <strong>B</strong>. Не приветствую такую практику.</p>
+<p><img src="1637246638482/7.jpg" title="7.jpg" width="951" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Оставляем пути системных папок по умолчанию:</p>
+<p><img src="1637246638486/8.jpg" title="8.jpg" width="951" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Читаем сводку проверки и запускаем настройку контроллера домена:</p>
+<p><img src="1637246638488/9.jpg" title="9.jpg" width="951" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>После первой перезагрузки продолжим настройку в PowerShell:</p>
+<pre>New-ADUser -name (Read-Host "User Name") -displayname (Read-Host "Display Name") -AccountPassword (Read-Host -AsSecureString "AccountPassword") -Enabled:$true<br><br>Add-ADGroupMember -Identity "Domain Admins" -Members (Read-Host "Domain administrator Name")<br><br>New-ADReplicationSubnet (Read-Host "Your Network") -Site default-first-site-name<br><br>Set-DnsClientServerAddress -InterfaceAlias ethernet -ServerAddresses ((Read-Host "Primary DNS"),(Read-Host "Secondary DNS"))<br><br>Add-DnsServerPrimaryZone -NetworkID (Read-Host "Your Network") -ReplicationScope "Forest"<br><br>shutdown -r -f -t 00</pre>
+<p><img src="1637246638492/10.jpg" title="10.jpg" width="1024" height="472" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Всё, контроллер домена установлен и настроен на выполнение базовой работы.</p>
+<p><img src="1637246638494/11.jpg" title="11.jpg" width="1024" height="577" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: right;"><em>Domain Controller Windows Server 2022</em><br><em>18 Ноября 2021</em></p>
+<div id="vk_comments" style="text-align: right;"></div>
+<div id="fb-root"></div>
+<p>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v2.8";
+  fjs.parentNode.insertBefore(js, fjs);
+ }(document, 'script', 'facebook-jssdk'));</script>
+</p>
+<div class="fb-comments" data-href="https://exonix.ru/%D0%A1%D1%82%D0%B0%D1%82%D1%8C%D0%B8/Windows_Server/Active_Directory/%D0%9A%D0%BE%D0%BD%D1%82%D1%80%D0%BE%D0%BB%D0%BB%D0%B5%D1%80_%D0%B4%D0%BE%D0%BC%D0%B5%D0%BD%D0%B0_2022/" data-width="670" data-numposts="20">&nbsp;</div>

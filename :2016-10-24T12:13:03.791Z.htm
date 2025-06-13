@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p style="text-align: center;"><strong>Установка Windows Server 2016 (без графической оболочки)</strong></p>
+<p style="text-align: justify;">&nbsp;Осенью 2016 года вышел новый Windows Server 2016. В данной статье будет описана установка без графического интерфейса. <span style="color: #ff0000;"><strong>Внимание</strong></span>: в Windows Server 2016 нельзя переключаться между режимами установки с графикой и без. По этой причине (да и не только) некоторые приложения, зависимые от графической оболочки, могут не установиться, даже если установка была выполнена с поддержкой графической оболочки. По сравнению с установкой Windows Server 2012 R2 Core в процессе установки нового сервера есть несколько изменений.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install1.png" caption="false" width="1024" height="768" /></p>
+<p>&nbsp;Во-первых исчезла надпись "установка в режиме Ядра" (без графической оболочки). Сижу теперь и думаю, Nano это или не Nano...</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install2.png" caption="false" width="1024" height="768" /></p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install3.png" caption="false" width="1024" height="768" /></p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install4.png" caption="false" width="1024" height="768" /></p>
+<p style="text-align: justify;">&nbsp;Во-вторых, теперь так выглядит начальное назначение пароля Администратору. При этом, после ввода пароля не нужно нажимать Enter, чтобы перейти к подтверждению пароля (я по крайней мере не нажимал, а достаточно нажать TAB:</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install5.png" caption="false" width="1024" height="768" /></p>
+<p>&nbsp;После ввода пароля мы сразу входим в систему.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install6.png" caption="false" width="1024" height="768" /></p>
+<p>&nbsp;Если в powershell проверить наличие компонентов графической оболочки - то ничего не будет найдено, как например, в 2012 R2:</p>
+<pre>PS C:\Windows\system32&gt; <strong>Get-WindowsFeature -Name "*Gui*","user*","Desktop*"</strong><br /><br />Display Name Name Install State<br />------------ ---- -------------<br />[X] User Interfaces and Infrastructure User-Interfaces-Infra Installed<br /> [X] Graphical Management Tools and Infrastructure Server-Gui-Mgmt-Infra Installed<br /> [X] Desktop Experience Desktop-Experience Installed<br /> [X] Server Graphical Shell Server-Gui-Shell Installed</pre>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install7.png" caption="false" width="1024" height="768" /></p>
+<p>&nbsp;В утилиту быстрой настройки <span style="color: #ff0000;"><strong>sconfig</strong></span> добавили два пункта: Настройки Телеметрии и Активация Windows:</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install8.png" caption="false" width="1024" height="768" /></p>
+<p>Сразу после установки необходимо проверить наличие обновлений (а они уже есть). Обновление длится очень&nbsp;долго...</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/2016/install9.png" caption="false" width="1024" height="768" /></p>
+<p>&nbsp;После переименования сервера, установку Windows Server 2016 можно считать завершённой.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" src="http://fs.exonix.ru/2016/install10.png" caption="false" width="1024" height="768" /></p>
+<p>&nbsp;Список доступных ролей в Windows Server:</p>
+<p><img src="http://fs.exonix.ru/2016/install11.png" alt="" caption="false" class="" style="display: block; margin-left: auto; margin-right: auto;" width="1024" height="728" /></p>
+<p style="text-align: right;"><em>24.10.2016</em></p>
+<div id="vk_comments"></div>
+</body>
+</html>

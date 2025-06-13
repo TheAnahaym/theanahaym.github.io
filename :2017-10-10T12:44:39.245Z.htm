@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>&nbsp;В статье будет рассмотрена установка Zabbix 3.4 на Debian 9.1.0 <strong>x64</strong>.</p>
+<pre>Linux BER-LSRV3 4.9.0-4-amd64 #1 SMP Debian 4.9.51-1 (2017-09-28) x86_64 GNU/Linux</pre>
+<p>&nbsp;Есть <a href="https://www.zabbix.com/documentation/4.0/manual/installation/install_from_packages/debian_ubuntu" target="_blank" rel="noopener">официальная документация</a> по установке Zabbix 3.4 (как и многие другие статьи), но вот не получилось у меня установить и запустить Zabbix 3.4 и по этому я написал эту статью (к тому же, я давно ничего не писал...). Первым делом - установим Apache2. Да, начинается всё с простого, но если дать установщику Zabbix самому всё поставить - он там кое-чего лишнего установит.</p>
+<pre># aptitude versions apache2<br /><em>p 2.4.25-3+deb9u3 stable 500<br /></em><br />aptitude install apache2</pre>
+<p>&nbsp;Следующим шагом будет установка php 7.1. Если дать это поставить установщику Zabbix, то он установит php 5.x. Собственно, это было главной трудностью в установке Zabbix (он работал с 7.1, а библиотеку&nbsp;<span>mysqli.so брал от 5.х).</span></p>
+<pre class="card-text"><code>aptitude install apt-transport-https ca-certificates
+wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+echo "deb https://packages.sury.org/php/ <strong>stretch</strong> main" &gt; /etc/apt/sources.list.d/php.list
+aptitude update</code></pre>
+<pre># aptitude versions php<br /><em>p 1:7.0+49 stable 500</em><br /><em>p 1:7.1+55+0~20170905045051.3+stretch~1.gbp8493dd </em><null> 500<br /></null>
+aptitude install php<strong>7.1 php7.1-bcmath php7.1-mbstring php7.1-xmlwriter php7.1-xmlreader<br /><br />php -v<br /></strong><em>PHP 7.1.10-1+0~20170929170818.9+stretch~1.gbp501135 (cli) (built: Sep 29 2017 17:08:20) ( NTS )</em><br /><em>Copyright (c) 1997-2017 The PHP Group</em><br /><em>Zend Engine v3.1.0, Copyright (c) 1998-2017 Zend Technologies</em><br /><em> with Zend OPcache v7.1.10-1+0~20170929170818.9+stretch~1.gbp501135, Copyright (c) 1999-2017, by Zend Technologies</em><strong><br /></strong></pre>
+<p>&nbsp;Ну а далее по официальной документации:</p>
+<pre class="code"># wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
+dpkg -i zabbix-release_3.4-1+stretch_all.deb
+aptitude update
+aptitude install zabbix-server-mysql zabbix-frontend-php
+aptitude install zabbix-proxy-mysql</pre>
+<p>&nbsp;Создаём базы данных:</p>
+<pre>mysql -uroot -p<br />create database zabbix character set utf8 collate utf8_bin;<br />grant all privileges on zabbix.* to zabbix@localhost identified by '&lt;password&gt;';<br />create database proxy character set utf8 collate utf8_bin;<br />grant all privileges on proxy.* to zabbix@localhost identified by '&lt;password&gt;';<br />exit</pre>
+<pre class="code">zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -uzabbix -p zabbix<br />zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -uzabbix -p proxy</pre>
+<pre class="code">nano /etc/zabbix/zabbix_server.conf
+DBHost=localhost
+DBName=<strong>zabbix</strong>
+DBUser=zabbix
+DBPassword=&lt;password&gt;</pre>
+<pre>nano /etc/zabbix/zabbix_<strong>proxy</strong>.conf<br />DBHost=localhost<br />DBName=<strong>proxy</strong><br />DBUser=zabbix<br />DBPassword=&lt;password&gt;</pre>
+<pre class="code"># service zabbix-server start
+update-rc.d zabbix-server enable<br />service zabbix-proxy start
+update-rc.d zabbix-proxy enable</pre>
+<p>&nbsp;Подредактируем <span>/etc/apache2/conf-enabled/zabbix.conf</span>:</p>
+<pre class="code">php_value date.timezone Europe/Berlin<br />service apache2 restart</pre>
+<p>&nbsp; Устанавливаем агент:</p>
+<pre class="code">aptitude install zabbix-agent<br />service zabbix-agent start</pre>
+<p>&nbsp;А теперь настройка в веб-интерфейсе:</p>
+<p><a href="http://ip.zabbix.server/zabbix">http://ip.zabbix.server/zabbix</a></p>
+<p><img src="http://fs.exonix.ru/linux/zab1.png" alt="" width="859" height="543" caption="false" class="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><strong>Admin:zabbix</strong></p>
+<p><img src="http://fs.exonix.ru/linux/zab2.png" alt="" width="907" height="581" caption="false" class="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: right;"><em>10.10.2017</em></p>
+<div id="vk_comments"></div>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v2.8";
+  fjs.parentNode.insertBefore(js, fjs);
+ }(document, 'script', 'facebook-jssdk'));</script>
+<div class="fb-comments" data-href="http://exonix.ru/#!%D0%A1%D1%82%D0%B0%D1%82%D1%8C%D0%B8/Windows_Server/Active_Directory/Office_365_-_DirSync/" data-width="670" data-numposts="20"></div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012_R2.Экспорт_и_импорт_ВМ">Экспорт и импорт ВМ</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012_R2">Hyper-V 2012 R2</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Hyper-V_2012_R2.Создание_виртуальной_машины">Создание виртуальной машины</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;<br><br></p>
+<p style="text-align: justify;">&nbsp;Все свои тесты я провожу на виртуальных машинах. И очень часто требуется чистая установка OS, чтобы исключить влияние следов от установленных приложение и ролей. Сама установка не занимает много времени, а вот установка обновлений, и особенно не для новых OS, может занять от часу времени. По этому, как правило, после установки первой ВМ, установки всех обновлений, установки "всегда необходимых" компонентов (вроде telnet client) я выполняю экспорт настроенной OS, чтобы можно было импортировать в новую ВМ за несколько минут. Начиная с Hyper-V 4.0 экспорт можно выполнять и со снимков OS:</p>
+<p><img height="685" width="668" alt="imp0.png" src="1665845879349.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Выбираем место расположения данных экспорта. Хотя импорт ВМ можно выполнять и без экспорта, я всё же предпочитаю иметь копию ВМ в виде экспортированных данных.</p>
+<p><img height="707" width="781" alt="imp00.png" src="1665845879351.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Далее, выбираем в меню Import Virtual Machine и выполняем действия, предложенные визардом.</p>
+<p><img height="540" width="718" alt="imp1.png" src="1665845879353.png" style="display: block; margin-left: auto; margin-right: auto;">&nbsp;Выбираем, откуда будем импортировать ВМ:</p>
+<p><img height="706" width="830" alt="imp2.png" src="1665845879355.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Не понятно, почему дата создания ВМ датирована началом XVII века... Сейчас проверил - у ВМ созданных с нуля такая же дата. Оказывается, это <a target="_blank" rel="noopener" href="http://social.technet.microsoft.com/Forums/windowsserver/en-US/d2679da3-dd59-424c-b8b7-03ce6325c8b8/hyperv-2012-r2-virtual-machine-creation-date-resets-to-01011601-after-host-reboot?forum=winserverhyperv">известный баг</a>.</p>
+<p style="text-align: justify;"><img height="540" width="718" alt="imp3.png" src="1665845879357.png" style="display: block; margin-left: auto; margin-right: auto;">&nbsp;Так как у меня источник экспорта активно участвует в тестах, то мне нужна ВМ с уникальным идентификатором, например, чтобы не было конфликта MAC адресов.</p>
+<p><img height="540" width="718" alt="imp4.png" src="1665845879359.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;"><img height="540" width="718" alt="imp5.png" src="1665845879361.png" style="display: block; margin-left: auto; margin-right: auto;">&nbsp;Выбираем место хранения файлов жёсткого диска. По умолчанию предлагается выбрать папку. Однако, если выполняется импорт из "живой" ВМ в общую папку для всех ВМ <span>(то есть без экспорта в другое расположение)</span>, то имена файлов жёстких дисков будут совпадать и импорт будет невозможен. По этому я создам отдельную папку для новой ВМ.</p>
+<p><img height="540" width="718" alt="imp6.png" src="1665845879363.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: center;"><img height="540" width="718" alt="imp7.png" src="1665845879365.png"></p>
+<p style="text-align: justify;">&nbsp;После окончания импорта, который длился всего 6 минут, ВМ имела статус Saved, и идентичный IP адрес, т.к. родительская ВМ была "снимком" работающей ВМ. Импорт с уникальным ID не сбрасывает уникальные идентификаторы OS, такие как SID, имя компьютера. Ниже с помощью утилиты <a target="_blank" rel="noopener" href="http://technet.microsoft.com/en-us/sysinternals/bb897417.aspx">PsGetSid</a> показаны SIDы новой ВМ и родительской ВМ (DNS идентификаторы вырезаны, т.к. родительская ВМ была в корпоративном домене):</p>
+<p style="text-align: center;"><img height="768" width="1024" alt="imp8.png" src="1665845879367.png"></p>
+<p style="text-align: center;"><img height="768" width="1024" alt="imp9.png" src="1665845879369.png"></p>
+<p style="text-align: justify;">&nbsp;Для выполнения сброса уникальных идентификаторов лучше всего будет воспользоваться утилитой sysprep:</p>
+<p style="text-align: center;"><img height="768" width="1024" alt="imp10.png" src="1665845879371.png"></p>
+<p style="text-align: justify;">&nbsp;После перезагрузки будет предложено выбрать региональные настройки и назначить пароль для Administrator. На самом деле, sysprep можно было выполнить для родительской ВМ и до экспорта</p>
+<p style="text-align: justify;">&nbsp;На этом импорт ВМ завершён. Переименовываем ВМ и проверяем наличие последних обновлений.</p>
+<p style="text-align: center;"><img height="768" width="1024" alt="imp11.png" src="1665845879373.png"></p>
+<p style="text-align: right;"><em>16.11.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

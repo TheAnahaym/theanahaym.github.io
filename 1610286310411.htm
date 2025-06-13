@@ -1,0 +1,62 @@
+<p style="text-align: center;"><span style="font-size: 18pt;"><strong>Установка и Настройка Exchange 2019 на Windows Server 2019 Core</strong></span></p>
+<p>Современная тенденция такова, что on-premises Exchange Server вытесняется Exchange Online, который имеет массу преимуществ для небольших и средних компаний. Именно по этой причине Microsoft не предоставляет оценочную версию Exchange 2019, считая, что тем, кому нужна почтовая система или могут протестировать службы Microsoft 365 (бывший Office 365) или уже имеют опыт с предыдущими версиями Exchange. Более того, Microsoft даже не предоставляет обновления CU в открытом доступе. Их можно скачать только в Microsoft Volume Licensing Center. <span>Тем не менее, мне удалось получить копию 2019 CU5, а чтобы как-то сделать процесс установки более интересным, а также соответствовать и&nbsp;<strong><a href="https://docs.microsoft.com/en-us/exchange/plan-and-deploy/system-requirements?view=exchserver-2019#supported-operating-systems-for-exchange-2019" target="_blank" rel="noopener">рекомендациям </a></strong></span><strong><a href="https://docs.microsoft.com/en-us/exchange/plan-and-deploy/system-requirements?view=exchserver-2019#supported-operating-systems-for-exchange-2019" target="_blank" rel="noopener">Microsoft</a></strong><span> и повысить безопасность инфраструктуры, я проведу установку на </span>Windows Server 2019 Core<span>, которая не имеет графического интерфейса. Все требования для Exchange 2019 описаны в <strong><a href="https://docs.microsoft.com/en-us/exchange/plan-and-deploy/system-requirements?view=exchserver-2019" target="_blank" rel="noopener">документации Microsoft</a></strong>. Рассматривается следующая схема установки:</span></p>
+<p><span><img src="1610286310445/ex01.png" title="ex01.png" width="567" height="546" alt="" style="display: block; margin-left: auto; margin-right: auto;"></span></p>
+<p><span>Я буду устанавливать сразу два сервера для последующей конфигурации&nbsp;</span>DAG <span>с отдельной сетью для репликации баз данных. Также обратите внимание, что в сети не используется </span>IPv6<span> по двум причинам:<br></span><span>- мой домашний роутер </span>FritzBox<span> хоть и поддерживает </span>IPv6<span>, но он на столько &laquo;тупой&raquo;, что мне проще отключить IPv6 на серверах, чем настраивать роутер ради тестов<br></span><span>- </span>IPv6 <span>не поддерживается </span>Exchange <span>в чистом виде, то есть без </span>IPv4<span>, а в таком случае я не вижу никаких преимуществ в его использовании</span></p>
+<pre><span>Get-NetAdapterBinding -ComponentID&nbsp;&lsquo;ms_tcpip6&rsquo;&nbsp;| Disable-NetAdapterBinding -ComponentID&nbsp;&lsquo;ms_tcpip6&rsquo;&nbsp;-PassThru</span></pre>
+<p><span>В компании, где я сейчас работаю (январь 2021) вообще отключили IPv6 из соображений безопасности, или если выражаться, как и я написал выше - лень или незнание настройки файрволла на роутере. Первое, что нужно установить на серверах - обновления. Для этого воспользуемся SCONFIG - <strong>6</strong> - <strong>a - a</strong>.</span><span></span></p>
+<p><span><img src="1610286310449/ex02.png" title="ex02.png" width="1024" height="699" alt="" style="display: block; margin-left: auto; margin-right: auto;"></span></p>
+<p><span>Exchange 2019 CU4 и выше поддерживает только .Net Framework 4.8 и выше. Определить установленный .Net можно командой PoSh со сверкой <strong><a href="https://docs.microsoft.com/en-us/dotnet/framework/deployment/deployment-guide-for-developers" target="_blank" rel="noopener">таблицы</a></strong>:</span></p>
+<pre>(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release<br><br><strong>461814</strong></pre>
+<p>Скачиваем (файл полной установки, а <strong>не Web-установщик</strong>) и устанавливаем .Net Framework 4.8 (скачка через PoSh занимает много больше времени, поэтому лучше закачать установщик через общие папки, не забывая разрешить SMB на файерволле)</p>
+<pre>Get-NetFirewallRule -DisplayName "*SMB-in*" | ft DisplayName,Profile,Action,Enabled<br><br>Get-NetFirewallRule -DisplayName "*SMB-in*" | Enable-NetFirewallRule<br><br><br>Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2088631" -OutFile ndp48-x86-x64-allos-enu.exe<br><br>.\ndp48-x86-x64-allos-enu.exe /q</pre>
+<p><img src="1610286310457/ex03.png" title="ex03.png" width="1024" height="603" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>После перезагрузки:</p>
+<pre>(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release<br><br><strong>528049<br></strong></pre>
+<p>Установка <strong>Visual C++ 2013</strong> Redistributable Package:</p>
+<pre>Invoke-WebRequest "https://aka.ms/highdpimfc2013x64enu" -OutFile vC2013.exe<br>.\vC2013.exe</pre>
+<p><strong>Важно</strong>: Exchange 2019 больше не имеет роли <strong>Unified Messaging</strong>! Казалось бы, если в компании не планируется использовать <span>Lync Server или Skype for Business Server (хотя кому они нужны, когда есть Microsoft Teams), то и не надо установливать роль Media-Foundation и Unified Communications Managed API 4.0, но Exchange установщик всё равно ругнётся именно на API, поэтому устанавливаем API&nbsp;<strong>только</strong> с диска Exchange 2019:</span><span></span></p>
+<p><span><img src="1610286310475/ex12.png" title="ex12.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></span></p>
+<pre class="has-inner-focus" tabindex="0"><code class="lang-PowerShell" data-author-content="Install-WindowsFeature Server-Media-Foundation
+"><span><span class="hljs-pscommand">Install-WindowsFeature </span> <span class="hljs-pscommand">Server-Media</span>-Foundation
+</span></code><br>D:\UCMARedist\Setup.exe</pre>
+<p>Запускаем установку Exchange 2019, пойдём длинным путём рассматривая и кликая каждый шаг установщика. <span style="color: #e74c3c;"><strong>Обратите внимание</strong></span>: я <strong>не подготавливаю ни домен, ни лес</strong>, <strong>ни серверные роли</strong> - всё это делает сам установщик Exchange 2019.</p>
+<pre>D:\Setup.EXE</pre>
+<p><img src="1610286310459/ex04.png" title="ex04.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310463/ex05.png" title="ex05.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310465/ex06.png" title="ex06.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310467/ex07.png" title="ex07.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310469/ex08.png" title="ex08.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310471/ex10.png" title="ex10.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310473/ex11.png" title="ex11.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310477/ex13.png" title="ex13.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img src="1610286310479/ex14.png" title="ex14.png" width="800" height="700" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Установка будет завершена после перезагрузки сервера:</p>
+<p><img src="1610286310481/ex15.png" title="ex15.png" width="802" height="673" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Переходим в панель управления Exchange c другого сервера\компьютера:</p>
+<p><img src="1610286310483/ex16.png" title="ex16.png" width="1024" height="560" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Ну а дальше настройка не отличается от предыдущих версий Exchange. Первым делом добавляем все почтовые домены, которые будет обслуживать наш сервер. Так как мой почтовый домен совпадает с домен AD, то он уже присуствует в списке.</p>
+<p><img src="1610818352778/ex17.png" title="ex17.png" width="1024" height="688" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><strong>Коннектор на приём почты</strong> настроен по умолчанию, и если у вас нет пограничного почтового сервера типа EDGE или Postfix (пограниченые сервера, они же smarthost, нужны для дополнительной защиты и маршрутизации почты), то ничего изменять там не надо.</p>
+<p><img src="1610818352780/ex18.png" title="ex18.png" width="1024" height="1115" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>А вот <strong>коннектор на отправку</strong> почему-то поумолчанию отсутствует. Исправляем это через PowerShell - просто отправляем всю почту в интернет:</p>
+<pre>New-SendConnector -Internet -Name "INTERNET OUT" -AddressSpaces * -SourceTransportServers EX01</pre>
+<p>Следующее, что мы исправим - это URL служб Exchange сервера, такие как "клиентский доступ", "офлайн адресная книга" и т.д. Все службы изображены на рисунке ниже:</p>
+<p><img src="1610818352783/ex19.png" title="ex19.png" width="1024" height="488" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Все ссылки редактируются по одному правилу: копируем ссылку для внутренних клиентов, вставляем её для внешних клиентов заменяя адрес внутреннего сервера на имя, которое наши клиенты будут использовать находясь за пределами офисной сети. Если имена серверов совпадают, то ссылки можно просто скопировать. Вот пример:</p>
+<p><img src="1610818352785/ex20.png" title="ex20.png" width="892" height="518" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>После изменения служебных ссылок можно заняться сертификатом. Как видите из окна выше, браузеру не нравится самоподписанный сертификат Exchange. <strong>Сертификат</strong>, которому будут доверять все клиенты стоит денег, однако, можно использовать и бесплатные сертфикаты от <strong><a href="https://letsencrypt.org/" target="_blank" rel="noopener">Let's Encrypt</a></strong>, которые нужно обновлять каждые три месяца (можно автоматизировать), но мне для статьи хватит. Вот хорошая <strong><a href="https://blog.ipswitch.com/install-free-lets-encrypt-ssl-san-certificate-for-exchange-2019" target="_blank" rel="noopener">статья</a></strong> по установке сертификата. Для своего тестового стенда я написал отдельную <strong><a href="/Статьи/Exchange/Выпуск_сертификата_Let's_Encrypt_для_Exchange/" target="_blank" rel="noopener">статью</a></strong>.</p>
+<p><img src="1610884814205/ex23.png" title="ex23.png" width="1024" height="560" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Всё! После проброса портов 25 и 443 на фаерволе роутера ваш сервер будет готов к приёму и отправке почты, а также к клиентским подключениям (MAPI over HTTP). Все другие дополнительные порты описаны в <strong><a href="https://docs.microsoft.com/en-us/exchange/plan-and-deploy/deployment-ref/network-ports?view=exchserver-2019" target="_blank" rel="noopener">документации</a></strong>.</p>
+<p style="text-align: right;"><em>17.01.2021</em></p>
+<div id="vk_comments" style="text-align: right;">&nbsp;</div>
+<div id="fb-root">&nbsp;</div>
+<p>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v2.8";
+  fjs.parentNode.insertBefore(js, fjs);
+ }(document, 'script', 'facebook-jssdk'));</script>
+</p>
+<div class="fb-comments" data-href="http://exonix.ru/#!Статьи/Windows_Server/NPS/" data-width="670" data-numposts="20">&nbsp;</div>

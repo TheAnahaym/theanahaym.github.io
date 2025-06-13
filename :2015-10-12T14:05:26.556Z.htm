@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p style="text-align: justify;">&nbsp;В данной статье будет рассмотрена установка Exchange 2016&nbsp;в автоматическом режиме&nbsp;на контроллер домена под управлением Windows 2012 R2. Установка на отдельный сервер ничем не отличается. Предварительные требования к установке Exchange 2016:<br />- программные и аппаратные <a href="https://technet.microsoft.com/ru-RU/library/aa996719(v=exchg.160).aspx" target="_blank" rel="noopener">требования</a> для Exchange 2016<br />- требования к <a href="https://technet.microsoft.com/ru-RU/library/bb691354.aspx#Anchor_2" target="_blank" rel="noopener">компонентам</a> для Exchange 2016<br />- <a href="http://www.microsoft.com/en-us/download/details.aspx?id=42642" target="_blank" rel="noopener">Microsoft .NET Framework 4.5.2</a><br />- <a href="http://www.microsoft.com/en-US/download/details.aspx?id=34992" target="_blank" rel="noopener">Unified Communications Managed API 4.0 Runtime</a>&nbsp;(<a href="https://www.microsoft.com/en-us/download/details.aspx?id=47344" target="_blank" rel="noopener">API 5.0</a>)<br />- права Enterprise Admin или <a href="https://technet.microsoft.com/ru-RU/library/dd876881.aspx" target="_blank" rel="noopener">делегирование прав</a> при наличии Exchange 2013<br />- сервер установки:</p>
+<p><img width="801" height="699" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/exch/2016/ex160.png" /></p>
+<p>&nbsp;Изначально статья планировалась о нормальной установке, но там практически ничего не изменилось, по этому в целях экономии времени будем устанавливать атоматически. Все варианты автоматической установки описаны в <a href="https://technet.microsoft.com/ru-RU/library/aa997281.aspx" target="_blank" rel="noopener">этой статье</a>.<br />Установка необходимых компонентов для ролей Mailbox:</p>
+<pre style="margin: 0px; padding: 5px; text-align: left; color: #000000; text-transform: none; line-height: 17.55px; text-indent: 0px; letter-spacing: normal; overflow: auto; font-family: Consolas, Courier, monospace !important; font-size: 13px; font-style: normal; font-variant: normal; font-weight: normal; word-spacing: 0px; -ms-word-wrap: normal; widows: 1; -webkit-text-stroke-width: 0px;"><strong>Install-WindowsFeature</strong> AS-HTTP-Activation, Desktop-Experience, NET-Framework-45-Features, RPC-over-HTTP-proxy, RSAT-Clustering, RSAT-Clustering-CmdInterface, RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell, Web-Mgmt-Console, WAS-Process-Model, Web-Asp-Net45, Web-Basic-Auth, Web-Client-Auth, Web-Digest-Auth, Web-Dir-Browsing, Web-Dyn-Compression, Web-Http-Errors, Web-Http-Logging, Web-Http-Redirect, Web-Http-Tracing, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Lgcy-Mgmt-Console, Web-Metabase, Web-Mgmt-Console, Web-Mgmt-Service, Web-Net-Ext45, Web-Request-Monitor, Web-Server, Web-Stat-Compression, Web-Static-Content, Web-Windows-Auth, Web-WMI, Windows-Identity-Foundation</pre>
+<p>&nbsp;Никакая подготовка леса\домена не требуется, т.к. это всё сделает установщик и в графическом интерфейсе:</p>
+<p><img width="801" height="700" style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/exch/2016/ex165.png" /><img width="800" height="700" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/exch/2016/ex163.png" /></p>
+<p>И&nbsp;во время автоматической установки&nbsp;из командной строки:</p>
+<pre><strong>Setup.exe</strong> /mode:Install /role:Mailbox /OrganizationName:MyOrg /IAcceptExchangeServerLicenseTerms</pre>
+<p>для установки на другой жёсткий диск используйте ключ <strong>/TargetDir:"D:\Exchange Server"<br /></strong>и ключ для расположения логов на другой диск: <strong>/LogFolderPath:"E:\Logs"</strong></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/exch/2016/ex161.png" /></p>
+<p>После&nbsp;перезагрузки сервера&nbsp;установка&nbsp;Exchange 2016 будет&nbsp;завершена.</p>
+<p style="text-align: right;"><em>12.10.2015</em></p>
+<div id="vk_comments"></div>
+</body>
+</html>

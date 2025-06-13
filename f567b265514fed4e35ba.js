@@ -1,0 +1,1 @@
+(self.webpackChunk=self.webpackChunk||[]).push([[278],{2135:e=>{e.exports=function(e){"complete"===document.readyState||"interactive"===document.readyState?e.call():document.attachEvent?document.attachEvent("onreadystatechange",(function(){"interactive"===document.readyState&&e.call()})):document.addEventListener&&document.addEventListener("DOMContentLoaded",e)}}}]);

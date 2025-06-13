@@ -1,0 +1,110 @@
+<!doctype html><html><head><meta name="generator" content="kosmos3.com"/><meta charset="utf-8"/><title>DNS</title><base href="/"/><meta name="description" content=""/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta property="og:title" content="DNS"/><meta property="og:description" content=""/><meta property="og:type" content="website"/><meta property="og:url" content="https://exonix.ru/%D0%A1%D1%82%D0%B0%D1%82%D1%8C%D0%B8/Windows_Server/DNS/"/><meta property="og:image" content=" "/><meta name="google-site-verification" content=""/><meta name="yandex-verification" content="782d99977f221efc"/><meta name="keywords" content=""/><link rel="canonical" href="https://exonix.ru/%D0%A1%D1%82%D0%B0%D1%82%D1%8C%D0%B8/Windows_Server/DNS/"/><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="icon" href="/icon.svg" type="image/svg+xml"/><link rel="apple-touch-icon" href="icon.png"/><script defer="defer" src="35987de043eadfbac029.js"></script><script defer="defer" src="6e8da963a952f290426e.js"></script><script defer="defer" src="caab2fd6f178a464e783.js"></script><script defer="defer" src="cea3e0bef8bcd170fd9e.js"></script><script defer="defer" src="caa6139840eae963be39.js"></script><script defer="defer" src="eacd0d418788166e2ae1.js"></script><script defer="defer" src="b403ba1b50235d0c77a0.js"></script><script defer="defer" src="2f2c125db900c7def701.js"></script><script defer="defer" src="a2c9a3d6441fa7f47144.js"></script><script defer="defer" src="cc7419fd89288af206a6.js"></script><script defer="defer" src="d62024abe8947a74a2f5.js"></script><script defer="defer" src="ce2c7263ca855fbcb35e.js"></script><script defer="defer" src="c59175f9ca99e24d1bd3.js"></script><script defer="defer" src="9217eeb01724e3ff8b12.js"></script><script defer="defer" src="8d951af21d9a2fb61271.js"></script><script defer="defer" src="d140a0646d371e2d543d.js"></script><script defer="defer" src="ba7c8ee9b295f8df014d.js"></script><script defer="defer" src="d6d17816db46260d76a9.js"></script><script defer="defer" src="fb202151454e4df03fcb.js"></script><link href="464b4ab657e789bb6f9b.css" rel="stylesheet"><link href="675ab082df3cfd69353d.css" rel="stylesheet"><link href="b13f62cc09d29239cd87.css" rel="stylesheet"><link href="82eda635a394addd3694.css" rel="stylesheet"><link href="325ca391f07b17edc66b.css" rel="stylesheet"><link href="bedb80fb32fde87c536e.css" rel="stylesheet"><link href="d3a65e4b5830dc71eb5a.css" rel="stylesheet"><link href="6331727f9e074c2cd59f.css" rel="stylesheet"><link href="index.cdn.css" rel="stylesheet"/><link href="index.css" rel="stylesheet"/><link rel="manifest" href="site.webmanifest"/><meta name="theme-color" content="#fafafa"/><script id="yandex">(function (m, e, t, r, i, k, a) {
+        m[i] =
+          m[i] ||
+          function () {
+            (m[i].a = m[i].a || []).push(arguments);
+          };
+        m[i].l = 1 * new Date();
+        (k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a);
+      })(
+        window,
+        document,
+        "script",
+        "https://mc.yandex.ru/metrika/tag.js",
+        "ym"
+      );
+      ym("55256677", "init", {
+        id: "55256677",
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        ut: "noindex",
+      });</script><script async="async" src="https://www.google-analytics.com/analytics.js"></script></head><body><div class="ui sidebar very wide vertical accordion menu"></div><div class="ui main menu fixed" hidden><a class="launch icon item"><i class="content icon"></i></a><div class="header item">DNS</div></div><div class="pusher"><div style="z-index: 8;" class="ui fluid container" data-absolute=""><div data-id="rmenu" data-menu-icons="false" data-icons="true" data-animation="true" data-close-on-click="true" data-direction="default" data-hover-delay="100" data-open-on-click="false" data-orientation="horizontal" data-popup-collision="true" data-scrollable="true" id="menu" class="" style="align-self: center; margin-top: 503px; border-style: none; border-color: rgb(204, 204, 204) rgb(204, 204, 204) rgb(204, 204, 204) rgb(0, 0, 0); color: rgb(102, 102, 102); opacity: 1; background-position: 0% 0%; background-repeat: repeat; background-attachment: scroll; background-size: auto;"></div></div><div data-static="" class="ui container" style="z-index: 7;"><div id="content" style="margin: 558px 4px 200px; min-height: 600px; flex: 1 1 auto; padding: 20px; border-width: 2px; border-style: double; border-color: rgb(204, 204, 204); color: rgb(102, 102, 102); opacity: 1; background-repeat: repeat; background-attachment: scroll;" class="well" data-turbomenu="false"><main v-if="!content"><div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.DNS">DNS</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.DNS.Управление_доменной_зоной">Управление доменной зоной</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;DNS - Domain Name System. Одна из важнейших используемых ролей, отвечающих за сопоставление доменных имён IP адресам. С внедрением IPv6 её значимость ещё значительнее увеличивается. ДНС сервера делятся на кеширующие, перенаправляющие запросы и авторитарные. ДНС сервера, которым делегированы доменные зоны являются авторитарными, в противном случае вы получите &nbsp;Non-authoritative answer от nslookup. Настройка и управление ДНС на самом деле не является сложным делом. Однако, часто на форумах появляются темы о восстановление работы Active Directory, с которой ДНС сильно взаимосвязаны. Причинами некорректной работы Active Directory во многих случаях является "настройка" ДНС.</p>
+<p style="text-align: justify;">&nbsp;Немного истории операционных систем. В Windows Server 2003 необходимо (я рекомендую) выбирать и AD и ДНС. Я не знаю почему, но очень часто администраторы устанавливают сначала ДНС, настраивают и только потом устанавливают AD. Никогда так не поступал, а всегда устанавливал ДНС вместе с AD. У знакомого недавно был случай, когда он решил настроить второй контроллер домена, но по незнанию ДНС устанавливать не стал. Через некоторое время первый (по порядку) контроллер домена сломался, ну и ДНС вмести с ним. Восстановить контроллер домена не удалось. Вот они как-то и работали на втором контроллере домена без ДНС. В итоге пришлось устанавливать новый домен и импортировать пользователей. Не мигрировать, а именно экспортировать и импортировать, так как для миграции нужны доверительные отношения, которым нужен кто? Правильно - ДНС.</p>
+<p style="text-align: justify;">&nbsp;Конечно, бывают случаи когда ДНС нужен без AD, но через некоторое время компания может развернуть инфраструктуру AD. Вот почему важно планировать инфраструктуру с учётом расширения компании. Мне не приходилось работать с такой организацией. Если компании нужен ДНС для работы с сетью Интернет - я рекомендую использовать ДНС сервера предоставляемые провайдером или открытые ДНС Google, например 8.8.8.8. Если у вас есть веб-сайт я рекомендую использовать платные\бесплатные ДНС хостинговой компании. Так надёжнее.</p>
+<p style="text-align: justify;">&nbsp;Начиная с Windows Server 2008 ДНС по умолчанию устанавливается во время настройки AD DS через DCPROMO, и автоматически правильно настраивается. Единственное, что нужно в него будет добавить: <em>это адреса серверов пересылки (адреса ДНС серверов вашего провайдера или Гугла) и Обратную зону</em>. Установку роли ДНС 2012 я покажу на примере отдельной установки без AD, а настройку с AD. Если у вас контроллер домена имеет несколько сетевых интерфейсов, то предварительно рекомендую настроить сетевые интерфейсы в соответствии с <a href="http://support.microsoft.com/kb/272294">данной статьёй</a>. А именно - исключить недоменный интерфейс из регистрации в ДНС. Сетевые настройки самого недоменного интерфейса в этом случае не важны. Но бывают случаи (на моей практике это было один раз) когда и в случае отключённой регистрацией указанные ДНС в свойствах недоменной сетевой карты влияли на работу сервера. Ну и чтобы не было споров нужны там ДНС или нет - я не рекомендую использовать контроллеры домена в качестве маршрутизаторов. Если &nbsp;у вас просто Windows Server 2012 в качестве маршрутизатора, то лично я настраиваю сеть как и на любом "аппаратном" маршрутизаторе, то есть с ДНС во внешнем интерфейсе. Вторая причина моего выбора: в случае отказа доменного ДНС, сам сервер будет использовать внешний ДНС автоматически. Установка начинается в Server Manager:</p>
+<p><img height="768" width="1024" alt="dns1.png" src="1665845879227.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Предупреждение, что у нас не назначен статический IP адрес. Для тестов я позволю себе остаться на динамическом адресе.</p>
+<p><img height="768" width="1024" alt="dns2.png" src="1665845879229.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="dns3.png" src="1665845879231.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;&nbsp;Теперь кратко о настройке.&nbsp;В свойствах сервера ДНС, первая вкладка определяет какие интерфейсы будет обслуживать данный ДНС сервер. По умолчанию выделены все.</p>
+<p><img height="768" width="1024" alt="dns4.png" src="1665845879233.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;<span style="color: #ff0000;"><strong>Forwarders (Адреса пересылки)</strong></span> - здесь указываются вышестоящие ДНС сервера, на которые будет отправлять запросы ваш ДНС сервер, если не обнаружит записи у себя. Как правило это ДНС провайдера или открытые ДНС, например google 8.8.8.8. В примере я указал другой внутренний ДНС сервер.</p>
+<p><img height="768" width="1024" alt="dns5.png" src="1665845879235.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Некоторые опции ДНС сервера. Если у вас кластер из веб-серверов и одно доменное имя имеет несколько IP адресов, то Round Robin позволяет поочередно выдавать разные IP адреса. Вот пример работы Round Robin:</p>
+<blockquote>
+<div>C:\Users\user&gt;nslookup ya.ru</div>
+<div>Server: &nbsp;dc1.domain.local</div>
+<div>Address: &nbsp;192.168.10.10</div>
+<div>&nbsp;</div>
+<div>Non-authoritative answer:</div>
+<div>Name: &nbsp; &nbsp;ya.ru</div>
+<div>Addresses: &nbsp;<span style="color: #ff0000;">87.250.251.3</span></div>
+<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">93.158.134.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 93.158.134.203</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 213.180.193.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 213.180.204.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 77.88.21.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 87.250.250.3</span></div>
+<div><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 87.250.250.203</span></div>
+<div>&nbsp;</div>
+<div>C:\Users\user&gt;ping ya.ru</div>
+<div>&nbsp;</div>
+<div>Pinging ya.ru [93.158.134.<span style="color: #ff0000;"><strong>3</strong></span>] with 32 bytes of data:</div>
+<div>Reply from 93.158.134.3: bytes=32 time=35ms TTL=53</div>
+<div>Reply from 93.158.134.3: bytes=32 time=42ms TTL=249</div>
+<div>Reply from 93.158.134.3: bytes=32 time=48ms TTL=53</div>
+<div>Reply from 93.158.134.3: bytes=32 time=38ms TTL=53</div>
+<div>&nbsp;</div>
+<div>Ping statistics for 93.158.134.3:</div>
+<div>&nbsp; &nbsp; Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),</div>
+<div>Approximate round trip times in milli-seconds:</div>
+<div>&nbsp; &nbsp; Minimum = 35ms, Maximum = 48ms, Average = 40ms</div>
+<div>&nbsp;</div>
+<div>C:\Users\user&gt;ipconfig /flushdns</div>
+<div>&nbsp;</div>
+<div>Windows IP Configuration</div>
+<div>&nbsp;</div>
+<div>Successfully flushed the DNS Resolver Cache.</div>
+<div>&nbsp;</div>
+<div>C:\Users\user&gt;ping ya.ru</div>
+<div>&nbsp;</div>
+<div>Pinging ya.ru [93.158.134.<span style="color: #ff0000;"><strong>203</strong></span>] with 32 bytes of data:</div>
+<div>Reply from 93.158.134.203: bytes=32 time=41ms TTL=249</div>
+<div>Reply from 93.158.134.203: bytes=32 time=43ms TTL=249</div>
+<div>Reply from 93.158.134.203: bytes=32 time=36ms TTL=53</div>
+<div>Reply from 93.158.134.203: bytes=32 time=40ms TTL=53</div>
+<div>&nbsp;</div>
+<div>Ping statistics for 93.158.134.203:</div>
+<div>&nbsp; &nbsp; Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),</div>
+<div>Approximate round trip times in milli-seconds:</div>
+<div>&nbsp; &nbsp; Minimum = 36ms, Maximum = 43ms, Average = 40ms</div>
+</blockquote>
+<p style="text-align: justify;">&nbsp;</p>
+<p><img height="768" width="1024" alt="dns6.png" src="1665845879237.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Root Hints - корневые ДНС сервера. Тоже самое что и сервера пересылке, только надёжность намного выше. Подразумевается, что root hints всегда доступны. Почему-то в ДНС 2012 прописан только один корневой сервер, обычно и там около десятка.</p>
+<p><img height="768" width="1024" alt="dns7.png" src="1665845879239.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;<span style="color: #ff0000;"><strong>Создаём обратную зону</strong></span>. Без неё невозможно будет создать PTR записи. Все пункты по умолчанию. Вписать лишь нужно ID вашей сети. В моём примере обратная зона уже создана.</p>
+<p><img height="768" width="1024" alt="dns8.png" src="1665845879241.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="dns9.png" src="1665845879243.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;На этом базовая настройка завершена. ДНС сервер готов к обслуживанию клиентов.</p>
+<p style="text-align: justify;">&nbsp;Одно замечание по установке. Во время попытки установки AD DS и DNS одновременно на 2008 R2 можно было увидеть следующее сообщение. В Windows Server 2012 можно одновременно выбрать AD DS и DNS роли.</p>
+<p><img height="768" width="1024" alt="dns19.png" src="1665845879245.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: right;"><em>30.04.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div></main><main v-else v-html="content"></main></div></div><div data-absolute="" class="ui fluid container" style="z-index: 6;"><div id="roof-wrap1" style="min-width: 100%; align-self: center; margin-top: 0px; min-height: 483px; padding: 10px 0px 0px; border-width: 0px 0px 4px; border-style: none none solid; border-color: rgb(255, 255, 255) rgb(255, 255, 255) rgb(246, 187, 36); color: rgb(102, 102, 102); opacity: 1; background-color: rgb(255, 255, 255); background-position: 0% 0%; background-repeat: repeat; background-attachment: scroll; background-size: auto; box-shadow: rgb(0, 0, 0) 0px 0px 2px 2px; background-image: url(&quot;1567075815596/sama2.png&quot;);" class=""><div id="roof1" data-jkit="[slideshow:interval=7000;speed=250;animation=fade]"><img src="files/roof/dresden.jpg"><img src="files/roof/moskau.jpg"><img src="1589641442742/berlin.jpg"></div></div></div><div data-absolute="" style="z-index: 5;"><div id="roof-wrap2" style="margin-left: 0px; margin-right: 0px; margin-top: 0px; min-height: 155px; padding: 10px 0px 0px; border-width: 0px 0px 4px; border-style: none none solid; border-color: rgb(255, 255, 255) rgb(255, 255, 255) rgb(246, 187, 36); color: rgb(102, 102, 102); opacity: 1; background-color: rgb(255, 255, 255); background-position: 0% 0%; background-repeat: repeat; background-attachment: scroll; background-image: url(&quot;1567075817539/sama2.png&quot;);" class=""><div id="roof2"><img src="files/roof/site2.gif" width="100%"></div></div></div><div data-absolute="" class="ui container" style="z-index: 4;"><div class="" id="copyright" style="margin-left: 5px; min-width: 50px; align-self: center; margin-bottom: 148px; min-height: 38px; border-style: none; border-color: rgb(0, 0, 0); color: rgb(102, 102, 102); opacity: 1; background-repeat: repeat; background-attachment: scroll;"><p><a style="color: #6aa3b1;" href="//redaktr.com" title="Redaktr.com - твой бесплатный сайт в облаке! Начни redaktировать прямо сейчас!"><i style="text-shadow: 1px 1px 1px black;" class="fa fa-cloud-upload fa-3x"></i></a></p></div></div><div data-absolute="" class="ui container" style="z-index: 3;"><div class="" id="live-internet" style="margin-left: 70px; min-width: 88px; align-self: center; margin-bottom: 149px; min-height: 31px; border-style: none; border-color: rgb(0, 0, 0); color: rgb(102, 102, 102); opacity: 1; background-repeat: repeat; background-attachment: scroll;"><p></p></div></div><div data-absolute="" style="z-index: 2;"><div id="main-footer" style="margin-left: 0px; margin-right: 0px; margin-bottom: 0px; min-height: 177px; border-style: none; border-color: rgb(0, 0, 0); color: rgb(102, 102, 102); opacity: 1; background-position: 50% 0px; background-repeat: no-repeat; background-attachment: scroll; background-image: url(&quot;1567149113516/motherboard.png&quot;);" class=""></div></div><div data-absolute="" style="z-index: 1;"><div id="wholebg" style="margin: 0px; flex: 1 1 auto; border-style: none; border-color: rgb(0, 0, 0); color: rgb(102, 102, 102); opacity: 1; background-position: 0% 0%; background-repeat: repeat; background-attachment: scroll; background-image: url(&quot;1567075817543/leather_1.png&quot;);" class=""></div></div></div></body></html>

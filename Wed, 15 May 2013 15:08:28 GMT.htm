@@ -1,0 +1,51 @@
+<p style="text-align: justify;">&nbsp;Как и любая ОС, Linux начинается с установки. На своих серверах я использую дистрибутив Debian. Далее, немного о простой установке Debian. Образ дистрибутива можно скачать <a href="http://www.debian.org/CD/http-ftp/">здесь</a>. Для установки достаточно скачать только первый CD. Установка производилась на виртуальную машину Hyper-V 2012:&nbsp;CPU i7-2600, 2 GB RAM. <strong>Внимание: </strong>сетевая карта должны быть Legacy!&nbsp;Мы будем рассматривать установку без графического интерфейса. Так же, мы не будем устанавливать графическую оболочку, т.к. установка будет произведена для сервера. Однако, есть случаи, когда приложению может потребоваться графическая оболочка. Для статьи используется дистрибутив 6.0.6 х64</p>
+<p style="text-align: justify;"><img src="http://fs.exonix.ru/linux/deb1.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Выбор языка установки:</p>
+<p><img src="http://fs.exonix.ru/linux/deb2.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Выбор местоположения. От этого зависит часовой пояс и время на сервере.</p>
+<p><img src="http://fs.exonix.ru/linux/deb3.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb4.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb5.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Выбор кодировки. Т.к. болшенство программ на английском языке, я устанавливаю американскую кодировку UTF-8</p>
+<p><img src="http://fs.exonix.ru/linux/deb6.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Выбор раскладки клавиатуры.</p>
+<p><img src="http://fs.exonix.ru/linux/deb7.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Если в вашей сети нет DHCP сервера, вам нужно вручную настроить сетевую карту. Перед установкой в свойствах виртуальной машины необходимо указать Legacy сетевую карту, т.к. с синтетической сетевой картой ядро 2.6 не будет работать. После обновления ядра до весрии 3.4 Можно будет использовать синтетическую карту Hyper-V.</p>
+<p><img src="http://fs.exonix.ru/linux/deb8.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Задаём имя сервера</p>
+<p><img src="http://fs.exonix.ru/linux/deb9.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Т.к. у меня используется DHCP сервер он по умолчанию указал домен. Если у вас нет домена - пишем сюда рабочую группу.</p>
+<p><img src="http://fs.exonix.ru/linux/deb10.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Задаём и повторяем пароль для суперпользователя root.</p>
+<p><img src="http://fs.exonix.ru/linux/deb11.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb12.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Создаём пользователя без административных полномочий. Задаём и повторяем пароль для него.</p>
+<p><img src="http://fs.exonix.ru/linux/deb13.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb14.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb15.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Выбираем метод использования диска. Я использую по-умочланию. <a href="http://wiki.debian.org/LVM">Немного об LVM</a>.</p>
+<p><img src="http://fs.exonix.ru/linux/deb16.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb17.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Выбираем какие и сколько у нас будет разделов. По аналогии с Windows - логических дисков. Для тестовых серверов можно работать с одним разделом.</p>
+<p><img src="http://fs.exonix.ru/linux/deb18.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb19.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb20.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Так как я устанавливаю только систему без приложений я не буду сканировать другие диски на предмет дополнительных пакетов.</p>
+<p><img src="http://fs.exonix.ru/linux/deb21.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Некоторые пакеты на дисках могут быть устаревшими. Последние версии можно получить по сети.</p>
+<p><img src="http://fs.exonix.ru/linux/deb22.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Выбираем сервер поближе. У меня это немецкие сервера.</p>
+<p><img src="http://fs.exonix.ru/linux/deb23.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb24.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Указываем прокси сервер, если такой используется в огранизации для доступа к интернету.</p>
+<p><img src="http://fs.exonix.ru/linux/deb25.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Отказываюсь от установки "популярного контента"</p>
+<p><img src="http://fs.exonix.ru/linux/deb26.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Отключаю (<strong>ПРОБЕЛОМ</strong>) установку графической оболочки и добавляю SSH server для доступа и сети.</p>
+<p><img src="http://fs.exonix.ru/linux/deb27.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Устанавливаем загрузчик ОС GRUB. Он умеет загружать не только Linux, но и Windows.</p>
+<p><img src="http://fs.exonix.ru/linux/deb28.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb29.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/deb30.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Сразу после установки я, как правило, устанавливаю сервер NTP для синхронизации времени через интернет atp-get install ntp. На этом - всё.</p>
+<p style="text-align: right;"><em> 23.09.2012</em></p>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>&nbsp;</p>
+<pre>wbAdmin start backup -backupTarget:\\backup\Public\Aleks\ -include:C: -allCritical -quiet<br />wbadmin get versions<br /><br />Backup time: 17.01.2016 18:45<br />Backup location: Network Share labeled <a href="file://\\backup\Public\Aleks\">\\backup\Public\Aleks\</a><br />Version identifier: 01/17/2016-17:45<br />Can recover: Volume(s), File(s), Application(s), Bare Metal Recovery, System State<br /><br />wbadmin start recovery -version:01/17/2016-17:45 -backupTarget:\\backup\Public\Aleks\ -itemType:Volume -items:c:</pre>
+<p>&nbsp;</p>
+<pre>Dism /Mount-WIM /WimFile:C:\RemoteInstall\Boot\x64\Images\boot.wim /index:1 /MountDir:c:\mount
+Dism /image:c:\mount /Add-Driver /Driver:C:\Users\aleks\Desktop\PROWinx64\PRO1000\Winx64\NDIS62\ /Recurse
+dism /unmount-wim /Mountdir:c:\mount /commit</pre>
+<p>get-netfirewallrule -name "*remote*" | fl -property name,enabled,DisplayName<br />set-netfirewallrule -name "*RemoteEventLogSvc*" -enabled True</p>
+<p>&nbsp;</p>
+<p>Add-PswaAuthorizationRule -rulename NAME -username "domain\username" -computername servermane -configurationname microsoft.powerShell -force</p>
+<p>&nbsp;</p>
+<p>Reg export HKCU C:\Users\HKCU.reg</p>
+<p>Reg export HKLM C:\Users\HKCL.reg</p>
+<p>Reg export HKU C:\Users\HKU.reg</p>
+<p>Reg export HKCC C:\Users\HKCC.reg</p>
+</body>
+</html>

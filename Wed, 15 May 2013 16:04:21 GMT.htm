@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Exchange.Базовая_настройка_Exchange_2013">Базовая настройка Exchange 2013</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Exchange.Резервное_копирование_баз_Exchange_2010_SP2">Резервное копирование баз Exchange 2010 SP2</a></li>
+<li><a href="#!Статьи.Exchange.Установка_Exchange_2013">Установка Exchange 2013</a></li>
+<li><a href="#!Статьи.Exchange.Postfix_-_ClamAv_-_Exchange_2010">Postfix, ClamAV, Exchange 2010</a></li>
+<li><a href="#!Статьи.Exchange.Exchange_2010_PowerShell">Exchange 2010 PowerShell</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;Под базовой настройкой имеется ввиду необходимая минимальная настройка для получения, отправки почтовых сообщений, а так же работа почтовых клиентов. Сам алгоритм настройки не отличается от настройки Exchange 2010. Вся настройка будет произведена в EAC.</p>
+<p style="text-align: justify;">&nbsp;После установки Exchange 2013 первым делом необходимо определить домены, за которые отвечает ваш почтовый сервер. Доменом по умолчанию назначается домен Active Directory. Если почтовый домен и домен Active Directory не совпадают, вы можете добавить нужный вам почтовый домен. Exchange 2013 может обслуживать несколько почтовых доменов. Добавить новый домен можно в Mail Flow - Accepted Domain.</p>
+<p><img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/ex-set1.png" /></p>
+<p style="text-align: justify;">&nbsp;Для отправки сообщений необходимо создать коннектор с интернетом или fron-end сервером. Управление коннеторами отправки в Mail Flow - Send Connectors.</p>
+<p><img width="880" height="660" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/ex-set7.png" /></p>
+<p style="text-align: justify;">&nbsp;Назначаем имя коннектору и выбираем тип коннектора.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/ex-set3.png" /></p>
+<p style="text-align: justify;">&nbsp;Выбираем как отправлять почту. Использовать ДНС и МХ записи, или отправлять на smart host (front-end).</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/ex-set4.png" /></p>
+<p style="text-align: justify;">&nbsp;Указываем для каких доменов будет использоваться этот коннеткор. Все домены обозначаются знаком *.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/ex-set5.png" /></p>
+<p style="text-align: justify;">&nbsp;Добавляем сервер, через который который будет идти отправка. Выбрать можно любой Exchange сервер в организации.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/ex-set6.png" /></p>
+<p style="text-align: justify;">&nbsp;После добавления почтового домена, настройки коннектора почтовый сервер Exchange 2013 готов к отправке и приёму почтовых сообщений. Пользователи могут работать через веб интерфейс или Outlook 2010\2013. Для работы с мобильными приложеними или Outlook Anywhere необходимо купить SSL сертификат. Для нескольких доменов потребуется USS сертификат. В доменную зону на ДНС необходимо добавить новую запись типа А с именем autodiscover указывающую на ваш сервер. Рассмотрим процесс создания запроса на серификат. Выполняется всё так же в EAC Servers - Certificates. Выбираем "создать запрос для сертифката из центра сертификации", т.к. самоподписанные нам не нужны.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer1.png" /></p>
+<p style="text-align: justify;">&nbsp;Выбираем имя для сертификата.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer2.png" /></p>
+<p style="text-align: justify;">Т.к. у нас один домен, то нам не нужны сертификаты Wildcard.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer3.png" /></p>
+<p style="text-align: justify;">&nbsp;Выбираем сервер хранения сертификата.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer4.png" /></p>
+<p style="text-align: justify;">&nbsp;Т.к. сервер настроен на обслуживание вымышленного домена, то мы удаляем лишние записи для домена new-domain.com.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer5.png" /></p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer6.png" /></p>
+<p style="text-align: justify;">&nbsp;Заполняем информацию о нашей компании.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer7.png" /></p>
+<p style="text-align: justify;">&nbsp;Выбираем место, где сохранить файл с запросом. Самый простой путь - это системная "шара". Файл cert.req или его содержимое отправляем в центр сертификации. К сожалению, я пытался подписать сертификат с пробным периодом на месяц, но центры сертификации, в которые я обращался запрашивали мои паспортные данные. Есстественно, что для пробного сертификата я персональные данные отправлять не буду. По этому в пробных сертификатах мне отказывали.</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer8.png" /></p>
+<p style="text-align: justify;">&nbsp;После получения подписанного сертифката необходимо закончить запрос:</p>
+<p><img width="880" height="615" style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer9.png" /></p>
+<p style="text-align: justify;">После завершения запроса выбираем свойства сертификата и выбираем сервисы, которые будут его использовать:</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" alt="" src="http://fs.exonix.ru/exch/2013/cer10.png" /></p>
+<p style="text-align: justify;">&nbsp;На этом базовая настройка Exchange 2013 завершена. Первые две картинки были сделаны в Hyper-V, а там использовался IE браузер. Далее я уже подключался со своей рабочей станции, и использовал браузер Хром. Кстати, функция для шифрования почты с помощью S\MIME работает в IE, в Хроме - нет, в FireFox не проверял.</p>
+<p style="text-align: right;"><em>14.03.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<p style="text-align: justify;"></p>
+<div id="vk_comments"></div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Резервное_копирование_Active_Directory_2012">Резервное копирование Active Directory 2012&nbsp;</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2008_R2">Контроллер домена 2008 R2</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012">Контроллер домена 2012</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012_и_NAT">Контроллер домена 2012 и NAT</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Обновление_Active_Directory_2008R2_до_2012">Обновление Active Directory 2008R2 до 2012&nbsp;</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Доверительные_отношения_между_2008_R2_и_2012">Доверительные отношения между 2008 R2 и 2012</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;Резервные копии нужны для восстановления информации, служб и сервисов в случае выхода их из строя. Причины сбоев могут быть как программные, так и аппаратные. В статье я рассмотрю случай выхода из строя аппаратных компонентов системы. При этом в компании нет запасного контроллера домена. Единственное, что имеется в наличии - не сильно производительный компьютер. В первой части статьи будет выполнена резервная копия Active Directory. Во второй части - восстановление и проверка. Более подробную информацию о резервном копировании и восстановлении служб Active Directory вы можете прочитать в <a href="http://technet.microsoft.com/ru-ru/library/cc771290(v=ws.10).aspx">библиотеке технета</a>.</p>
+<p style="text-align: justify;">&nbsp;Все используемые операционные системы установлены на виртуальные машины. Хост сервер и гости имеют следующие конфигурации:<br><span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;- Intel 2700,&nbsp;</span><strong style="font-family: sans-serif; font-size: small; text-align: justify;">16</strong><span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;GB RAM, ATI 4550, Windows Server 2012 Eval, Hyper-V<br>&nbsp;- <a href="http://www.exonix.ru/?e2hojrlmnths5dpdu3gpz2l.htm">Контроллер домена</a>&nbsp;</span><span style="font-family: sans-serif; font-size: small; text-align: justify;">Windows Server 2012 Eval <strong>4</strong> GB</span>&nbsp;RAM<br>&nbsp;- Запасной компьютер&nbsp;<span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;</span><span style="font-family: sans-serif; font-size: small; text-align: justify;">Windows Server 2012 Eval <strong>2</strong> GB</span>&nbsp;RAM<br>&nbsp;- Клиент Windows 8 Ent Eval <strong>2</strong> GB RAM</p>
+<p style="text-align: justify;">Контроллер домена и предварительные настройки домена:</p>
+<p>&nbsp;<img height="768" width="1024" alt="bac1.png" src="1665513729714.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="bac2.png" src="1665513729716.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Клиентский компьютер с Windows 8 в домене.</p>
+<p><img height="768" width="1024" alt="bac3.png" src="1665513729718.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Для создания резервной копии я буду использовать штатные средства ОС: Windows Backup Server. Его можно установить как дополнение в диспетчере сервера. Дальнее управление будет проходить в соответствующей оснастке.</p>
+<p>&nbsp;<img height="768" width="1024" alt="bac4.png" src="1665513729720.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Создаём разовую резервную копию. Как и в предыдущих версиях Windows Server резервная копия Active Directory выполняется путём сохранения System State сервера.</p>
+<p>&nbsp;<img height="768" width="1024" alt="bac5.png" src="1665513729722.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;<img height="768" width="1024" alt="bac6.png" src="1665513729724.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Выбираем тип резервной копии Custom и System State, т.к. нам не требуется делать полный бекап.</p>
+<p>&nbsp;<img height="768" width="1024" alt="bac7.png" src="1665513729726.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;<img height="768" width="1024" alt="bac8.png" src="1665513729728.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Выбираем хранилище бекапа. На свой же локальный диск, где установлена система мы не сможем сделать бекап. Но никто не мешает создать нам там общую папку и выполнить бекап в неё. Однако, рекомендовано хранить бекап на внешнем хранилище. В случае аварии с сервером, где хранится резервная копии, мы можем демонтировать жёсткий диск и смонтировать его в другой системе. Однако, это может не сработать если из строя вышел именно жёсткий диск. Не дорогим решением внешнего хранилища может быть <a href="http://qnap.ru/catalog/nas">NAS, вроде этого</a>. Для крупных предприятий можно использовать серьёзные сервера хранения данных, например <a href="http://h41110.www4.hp.com/promo/eva4400/">HP EVA</a>. Если вы используете не штатное средство ОС, а к примеру приложение <a href="http://www.microsoft.com/ru-ru/server-cloud/system-center/data-protection-manager.aspx">DPM</a>, вы можете использовать самые надёжные хранилища резервных копий - <a href="http://ru.wikipedia.org/wiki/LTO">магнитные ленты</a> в <a href="http://ru.wikipedia.org/wiki/%D0%A1%D1%82%D1%80%D0%B8%D0%BC%D0%B5%D1%80">стримерах</a>.</p>
+<p>&nbsp;<img height="768" width="1024" alt="bac9.png" src="1665513729730.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;<img height="768" width="1024" alt="bac10.png" src="1665513729732.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;<img height="768" width="1024" alt="bac11.png" src="1665513729734.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">Время выполнения резервной копии в 10 GB на виртуальной машине - 13-14 минут.</p>
+<p>&nbsp;<img height="768" width="1024" alt="bac12.png" src="1665513729736.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">На этом резервное копирование Active Directory закончено. Можно перемещать данный бекап на сервер, где будет производится восстановление Active Directory.</p>
+<p style="text-align: right;"><em>04.12.2012</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

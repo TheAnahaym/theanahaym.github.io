@@ -1,0 +1,53 @@
+<p style="text-align: justify;">&nbsp;Давно уже жду выхода 7-ой версии Debian. На примере с Android OS новое ядро может дать много новых плюшек. Во время установки тестовой версии Debian 7 оказалось: ядро то в нём 3.2, что удивительно, т.к. 3.2 не очень работало на Hyper-V. Хорошо, что в релизной версии Debian ядро 3.2 уже содержит исправления. Установка будет производится на том же компьютере с Windows Server 2012. Для Debian 7 уже нет надобности выставлять сетевую &nbsp;карту Legacy. Алгоритм установки 7-ки мало отличается от предыдущей версии, но есть некоторые изменения.</p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb71.png" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Выбор языка установки:</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb72.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Выбор местоположения. От этого зависит часовой пояс и время на сервере. Почему-то и в 7-ке европейские страны "спрятаны".</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb73.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb74.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb75.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Выбор кодировки. Т.к. болшенство программ на английском языке, я устанавливаю американскую кодировку UTF-8</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb76.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Выбор раскладки клавиатуры.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb77.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;Дальше будет отличие. На следующем этаке в 6-ой версии идёт сразу настройка сети. В 7-ке перед настройкой DHCP клиента что-то ещё загружается ). Так же видна поддержка IPv6 клиента. В предыдущей версии этого этапа не было.</p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb78.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb79.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb710.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;Ещё одно отличие. В 6-ой версии ОС узнавала имя домена от DHCP, в 7-ке этого почему-то не происходит. Пишем вручную.</p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb711.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Задаём и повторяем пароль для суперпользователя root.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb712.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb713.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Создаём пользователя без административных полномочий. Задаём и повторяем пароль для него.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb714.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb715.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb716.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb717.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small; text-align: center;">&nbsp;Выбираем метод использования диска. Я использую по-умочланию.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb718.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb719.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Выбираем какие и сколько у нас будет разделов. По аналогии с Windows - логических дисков.<br />Для тестовых серверов можно работать с одним разделом.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb720.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb721.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb722.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Так как я устанавливаю только систему без приложений я не буду сканировать другие диски на предмет дополнительных пакетов.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb723.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb724.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Выбираем сервер поближе. У меня это немецкие сервера.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb725.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb726.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Указываем прокси сервер, если такой используется в огранизации для доступа к интернету.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb727.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Отказываюсь от установки "популярного контента"</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb728.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Следующие отличие. Во-первых теперь не Graphical, а Debian desktop enviroment. Во-вторых SSH сервер выбран по умолчанию. Ещё выбран принт-сервер.&nbsp;<span style="font-family: sans-serif; font-size: small;">Отключаю (</span><strong style="font-family: sans-serif; font-size: small;">ПРОБЕЛОМ</strong><span style="font-family: sans-serif; font-size: small;">) установку графической оболочки.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb729.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small;">&nbsp;Устанавливаем загрузчик ОС GRUB. Он умеет загружать не только Linux, но и Windows.</span></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb730.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb731.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/linux/debian7/deb24.png" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p></p>
+<p></p>
+<p style="text-align: justify;">&nbsp;На этом всё. Дальше можно обновить ядро до 3.8.</p>
+<p style="text-align: right;"><em>30.06.2013</em></p>

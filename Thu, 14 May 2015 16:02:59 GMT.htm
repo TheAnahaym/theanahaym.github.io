@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p style="text-align: center;"><strong>Синхронизация локального каталога Active Directory с Office 365</strong>.</p>
+<p style="text-align: justify;">&nbsp;В данной статье описывается настройка синхронизации учётных записей пользователей, их паролей из локально установленного домена Active Directory 2012 R2 в облачный сервис Office 365. Данная статья подходит для компаний, у которых, к примеру, нет собственного Exchange Server, но есть желание централизовать управление учётными записями пользователей. Так же данная статья подходит для тех компаний, которые не имеют собственного домена Active Directory, но планируют его реализовать и свести к минимуму количество паролей. Для лучшего понимания и безопасного внедрения я рекомендую зарегистрировать отдельную <a href="https://products.office.com/ru-ru/business/compare-office-365-for-business-plans" target="_blank" rel="noopener">бесплатную (30 дней) подписку</a>&nbsp;Office 365.</p>
+<p style="text-align: justify;">&nbsp;Используется&nbsp;следующая <strong>демонстрационная</strong>&nbsp;IT инфрастуктура, где&nbsp;сервер синхронизации <strong>ADFS1</strong> находится за двумя NAT:</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs00.png" /></p>
+<p style="text-align: justify;">Управляемый почтовый домен exonix.ru в Office 365:</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs0.png" /></p>
+<p style="text-align: justify;">&nbsp;Для синхронизации каталогов эту самую синхронизацию нужно включить в панели управления Office 365 (Пункт №3), а также скачать и установить инструмент синхронизации (Пункт №5):</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs1.png" /></p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs2.png" /></p>
+<p style="text-align: justify;">&nbsp;Установка запускается с повышенными правами и параметрами по умолчанию.&nbsp;Во время установки установщик загрузит и установит из интернет-репозитория Microsoft почти все необходимые дополнительные программы.&nbsp;Единственное, что потребуется скачать и установить отдельно -&nbsp;<a href="https://technet.microsoft.com/ru-ru/library/jj151815.aspx" target="_blank" rel="noopener">модуль Azure Active Directory</a>&nbsp;для Windows PowerShell, а также&nbsp;установить&nbsp;.Net Framework 3.5 из диспетчера сервера.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs3.png" /></p>
+<p style="text-align: justify;">&nbsp;После установки можно выполнить настройку синхронизации каталогов. Необходимо ввести данные административных учётных записей Office 365 и локального домена Active Directory, в моём случае <strong>от</strong>ключить гибридую конфигурацию и <strong>в</strong>ключить синхронизацию паролей пользовательских учётных записей. <strong>Самый последний шаг настройки - <span style="color: #ff0000;">от</span>ключить запуск синхронизации.</strong></p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs4.png" /></p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs5.png" /></p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs6.png" /></p>
+<p style="text-align: justify;">&nbsp;Запускаем&nbsp;Forefront identity manager. Возможно из-за автоматической установки FIM во время установки DirSync, его исполняемый файл не региструется в системе, и его нельзя найти в поиске, но можно по следующему пути:</p>
+<pre style="text-align: justify;">C:\Program Files\Windows Azure Active Directory Sync\SYNCBUS\Synchronization Service\UIShell\</pre>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs7.png" /></p>
+<p style="text-align: justify;">&nbsp;В FIM я&nbsp;укажу организационную единицу, пользователи которой будут синхронизироваться с Office 365. Помимо данной настройки можно использовать различные <a href="https://technet.microsoft.com/en-us/library/jj590228" target="_blank" rel="noopener">фильтры синхронизации</a>, в случаях когда перемещение пользователя в отдельное подразделение невозможно. В своей статье в качестве демонстрации&nbsp;я буду использовать именно отдельное подразделение.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs8.png" /></p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs9.png" /></p>
+<p style="text-align: justify;">&nbsp;&nbsp;Запустить синхронизацию можно с помощью PowerShell или FIM:</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs10.png" /></p>
+<p style="text-align: justify;">&nbsp;После синхронизации тестового пользователя, его копия без лицензии появится в Office 365.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs11.png" /></p>
+<p style="text-align: justify;">&nbsp;Далее необходимо настроить локальный домен так, чтобы учётные записи синхронизовались <a href="https://support.microsoft.com/ru-ru/kb/2641663" target="_blank" rel="noopener">со соответствующей учётной записью Office 365</a>. Для этого необходимо в оснастке "Домены и Доверия" добавить новый UPN, соответвующий почтовому домену exonix.ru, и назначить его пользователю, которому так же приписывается атрибут почтового адреса. Возможно, при настройке Sync Tool все суффиксы сами запишутся в оснастку.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs12.png" /></p>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" src="http://fs.exonix.ru/2012R2/adfs/adfs13.png" /></p>
+<p style="text-align: justify;">&nbsp;Фильтр, разрешающий синхронизацию для учётных записей,&nbsp;содержащих добавленный&nbsp;UPN. Данный фильтр следует понимать так (я не сразу разобрался): применить фильтр для тех, кто <strong>не содержит</strong> значение. Если применяется фильтр - то он блокирует синхронизацию учётной записи.</p>
+<p><img width="867" height="499" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/2012R2/adfs/adfs9.1.png" /></p>
+<p style="text-align: justify;">&nbsp;После миграции второго тестового пользователя тип пользователя Office 365 с "в облаке" изменится на "синхронизирован с Active Directory". Теперь для доступа к сервисам Office 365 можно использовать доменную учётную запись с её <a href="https://msdn.microsoft.com/ru-ru/library/azure/dn246918.aspx" target="_blank" rel="noopener">синхронизированным паролем</a>, который синхронизируется каждые <a href="https://msdn.microsoft.com/en-us/library/azure/dn246918.aspx" target="_blank" rel="noopener">2 минуты</a>. Остальные элементы каталога синхронизирутются раз в три часа. Синхронизация каталогов <strong>не</strong> реализует систему единого входа <a href="#!Статьи/Windows_Server/Active_Directory/Office_365_-_AD_FS">Single Sign On</a>.</p>
+<p style="text-align: center;"><img src="http://fs.exonix.ru/2012R2/adfs/adfs14.png" /></p>
+<p style="text-align: justify;">&nbsp;На этом настройка синхронизации учётных записей с паролями завершена.</p>
+<p style="text-align: justify;">&nbsp;C выходом нового коннектора "<em>Azure AD Connect</em>" поменялся инструмент фильтрации синхронизируемых учётных данных, а так же путь к FIM:</p>
+<pre style="text-align: justify;">"C:\Program Files\Microsoft Azure AD Sync\UIShell\miisclient.exe"</pre>
+<p style="text-align: justify;">Фильтрация теперь выполняется с помощью "<em>Synchronization Rules Editor</em>". Необходимо открыть от имени администратора, переключится на <strong>исходящие</strong> правила и склонировать правило "<em>Domain Join</em>". После чего во вкладке "<em>Scoping Filter</em>" добавить пункт "userPrincipalName" c окончанием равным синхронизируемым доменам:</p>
+<p><img width="864" height="570" style="margin-right: auto; margin-left: auto; display: block;" alt="" src="http://fs.exonix.ru/2012R2/adfs/adfs20.png" /></p>
+<p>&nbsp;После этого включаем синхронизацию по расписанию (каждые 30 минут по умолчанию):</p>
+<pre>set-ADSyncScheduler -SyncCycleEnabled $true</pre>
+<p style="text-align: right;"><em></em></p>
+<p style="text-align: right;"><em>14.05.2015</em></p>
+<p style="text-align: left;"><em><strong><span style="color: #ff0000;">Внимание</span></strong>:</em></p>
+<p style="text-align: left;">&nbsp;После синхронизации учётных записей сотрутся все псевдонимы у почты. По этому, прежде чем включать синхронизацию, сделайте список всех псевдонимов:</p>
+<pre style="text-align: left;">&nbsp;Get-Mailbox | fl -Property DisplayName,EmailAddresses</pre>
+<p style="text-align: justify;">&nbsp;Затем, следует добавить&nbsp;псевдонимы через любой редактор атрибутов. Например ADSIEdit. Необходимо заполнить атрибут <strong>proxyAddresses</strong>.&nbsp;Заполняется следующим образом:</p>
+<p style="text-align: justify;">&nbsp;- главный адрес указывается заглавными буквами <strong>SMTP</strong>:user@domain.com<br />&nbsp;- псевдонимы указываются строчными буквами <strong>smtp</strong>:alias1@domain.com</p>
+<p>Пример:<br /> <img width="873" height="582" alt="" src="http://fs.exonix.ru/2012R2/adfs/adfs19.png" /></p>
+<div id="vk_comments"></div>
+</body>
+</html>

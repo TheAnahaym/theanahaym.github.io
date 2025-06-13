@@ -1,0 +1,41 @@
+<div>
+<ul class="dropdown" data-jkit="[menu]">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Обновление_Active_Directory_2008R2_до_2012">Обновление Active Directory 2008R2 до 2012&nbsp;</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2008_R2">Контроллер домена 2008 R2</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012">Контроллер домена 2012</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012_и_NAT">Контроллер домена 2012 и NAT</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Резервное_копирование_Active_Directory_2012">Резервное копирование Active Directory 2012&nbsp;</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Доверительные_отношения_между_2008_R2_и_2012">Доверительные отношения между 2008 R2 и 2012</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp; С технической точки зрения обновление Active Directory 2008 R2 до 2012 не отличается от <a href="http://technet.microsoft.com/ru-ru/library/cc733027(v=ws.10).aspx">предыдущих обновлений Active Directory</a>, но есть и нововведения. Как и раньше для выполнения обновления можно вручную подготовить лес, домен с помощью команды adprep и установить второй контроллер домена под управлением ОС 2012, а можно сделать обновление леса и домена во время настройки роли AD DS. Выполнение команды adprep.exe /gpprep всё ещё нужно выполнять вручную. Документация об установке реплики&nbsp;<a href="http://technet.microsoft.com/en-us/library/jj574134.aspx">в библиотеке microsoft</a> на английском языке. Поддерживается обновление на месте AD DS для AD DS 2008\200R2. Я не рекомендую проводить обновление на месте, если кроме ролей AD DS на сервере установленны бизнес-приложения, т.к. они могут не поддерживать Windows Server 2012. Обновление на месте домена 2003\2003R2 не поддерживается.&nbsp; Обзор служб Active Directory 2012 на русском языке <a href="http://technet.microsoft.com/ru-ru/library/hh831484.aspx">там же в библиотеке</a>. Документация о <a href="http://technet.microsoft.com/en-us/library/jj574191.aspx">виртуализации служб Active Directory</a>&nbsp;на английском языке. Все дальнейшие действия я буду производить на виртуальных машинах Windows Server 2012. Исходная конфигурация сервера с виртуальными машинами:</p>
+<p style="text-align: justify;"><span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;- Intel 2700,&nbsp;</span><strong style="font-family: sans-serif; font-size: small; text-align: justify;">16</strong><span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;GB RAM, ATI 4550, Windows Server 2012 Eval, Hyper-V<br /> &nbsp;- VM1 контроллер домена&nbsp;</span><span style="font-family: sans-serif; font-size: small; text-align: justify;">Windows Server 2008 R2 Eval <b>2</b>&nbsp;GB</span><span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;RAM</span><br style="font-family: sans-serif; font-size: small; text-align: justify;" /> <span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;- VM2 </span><span style="font-family: sans-serif; font-size: small; text-align: justify;">Windows Server 2012 Eval&nbsp;<strong>2</strong>&nbsp;GB</span><span style="font-family: sans-serif; font-size: small; text-align: justify;">&nbsp;RAM</span></p>
+<p><img src="http://fs.exonix.ru/2012/2ad1.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad2.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">&nbsp;Я буду рассматривать <strong>ручное</strong> обновление леса и домена. Установим дистрибутив Windows Server 2012 в контроллер домена Windows Server 2008 R2, и скопируем от туда папку с утилитой ADPREP на локальный диск.</p>
+<p><img src="http://fs.exonix.ru/2012/2ad3.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Откроем командную строку от имени Администратора. Перейдём в скопированный каталог и выполним команды для обновления леса и домена: adprep.exe /forestprep и adprep.exe /domainprep</p>
+<p><img src="http://fs.exonix.ru/2012/2ad4.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad5.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Далее введём сервер 2012 в наш домен:</p>
+<p><img src="http://fs.exonix.ru/2012/2ad13.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">После перезагрузки установим роль AD DS. Далее я покажу только тем моменты, где требуется что-либо изменять или дополнять. Те моменты, где значения остаются по умолчанию - я позволю себе пропустить.</p>
+<p><img src="http://fs.exonix.ru/2012/2ad6.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad7.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad8.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad9.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad10.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Об установке&nbsp;<a href="http://technet.microsoft.com/ru-ru/library/cc770654(v=WS.10).aspx">с носителя можно прочитать тут</a>.</p>
+<p><img src="http://fs.exonix.ru/2012/2ad11.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad12.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad14.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">На этом всё. На контроллере домена дописываем в ДНС настройках сетевой карты адрес нового сервера. На новом контроллере убирем петлю 127.0.0.1 на третье место. На первых двух адреса контроллеров домена. Я у себя устанавливаю <em>неперекрестные</em> значения. О <span style="text-decoration: underline;"><em>возможных</em></span> проблемах с ДНС при наличие <a href="http://technet.microsoft.com/ru-ru/library/upgrade-domain-controllers-to-windows-server-2008-r2(v=ws.10).aspx#BKMK_DNS">более одного контроллера домена прочитайте тут</a>.</p>
+<p><img src="http://fs.exonix.ru/2012/2ad15.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p><img src="http://fs.exonix.ru/2012/2ad16.png" width="880" height="660" alt="" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+<p style="text-align: justify;">Убедительно прошу, прежде чем внедрять новый сервер в рабочую сеть - <strong>протестируйте на виртуальных машинах</strong>. Если что-то пойдёт не так после установки контроллера домена воспользуйтесь <a href="http://support.microsoft.com/kb/216498/ru">документацией по удалению данных из Active Directory контроллера домена</a>, который перестал правильно функционировать и понижение роли до рядового сервера не было успешно.&nbsp;</p>
+<p style="text-align: right;"><em>21.12.2012</em></p>

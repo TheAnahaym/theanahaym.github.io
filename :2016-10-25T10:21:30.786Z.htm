@@ -1,0 +1,44 @@
+<p>&nbsp;</p>
+<p style="text-align: center;"><strong>Контроллер домена Windows Server 2016</strong></p>
+<p style="text-align: justify;">&nbsp;Процесс установки и настройки контроллера домена в Windows Server 2016 ничем не отличается от процесса настройки в Windows Server 2012 R2.&nbsp;По этому в этой статье будет описано, как быстро настроить контроллер домена используя лишь 11 (<strong>!</strong>) команд (<em>а можно и 8</em>), введённые в PowerShell. Данная статья подходит как для настройки контроллера домена в режиме Core установки, так и для настройки контроллера домена с графическим интерфейсом. Вот эти одиннадцать команд:</p>
+<pre>New-NetIPAddress -InterfaceAlias ethernet –IPAddress (Read-Host "IP Address") –PrefixLength (Read-Host "MASK") -DefaultGateway (Read-Host "Default Gateway")<br><br>Set-DnsClientServerAddress -InterfaceAlias ethernet -ServerAddresses (Read-Host "Primary DNS")<br>
+Install-WindowsFeature AD-Domain-Services -IncludeManagementTools<br>
+Install-ADDSForest -DomainName (Read-Host "Domain Name") -DomainNetbiosName (Read-Host "NetBios Name") -InstallDns:$true -CreateDnsDelegation:$false<br>
+New-ADUser -name (Read-Host "User Name") -displayname (Read-Host "Display Name") -AccountPassword (Read-Host -AsSecureString "AccountPassword") -Enabled:$true<br>
+Add-ADGroupMember -Identity "Domain Admins" -Members (Read-Host "Domain administrator Name")<br>
+Disable-ADAccount -Identity Administrator<br><br>New-ADReplicationSubnet (Read-Host "Your Network") -Site default-first-site-name<br>
+Set-DnsClientServerAddress -InterfaceAlias ethernet -ServerAddresses ((Read-Host "Primary DNS"),(Read-Host "Secondary DNS"))<br><br>Add-DnsServerPrimaryZone -NetworkID (Read-Host "Your Network") -ReplicationScope "Forest"<br><br>shutdown -r -f -t 00</pre>
+<p style="text-align: justify;">&nbsp;А теперь рассмотрим подробнее значении каждой команды. Первая команда необходима для назначения серверу <span style="color: #ff0000;"><strong>статического IP адреса</strong></span>. Необходимо вручную ввести IP адрес, сетевую маску и шлюз по умолчанию для интерфейса Ethernet (название интерфейса по умолчанию):</p>
+<pre>New-NetIPAddress -InterfaceAlias ethernet –IPAddress (Read-Host "IP Address") –PrefixLength (Read-Host "MASK") -DefaultGateway (Read-Host "Default Gateway")</pre>
+<p><img height="651" width="1024" alt="dc1.png" src="1665513729458.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Далее необходимо указать IP адрес <span style="color: #ff0000;"><strong>публичного DNS или DNS провайдера</strong></span>. После установки этот адрес будет перемещён в настройки доменного DNS как адрес для пересылки.</p>
+<pre style="text-align: justify;">Set-DnsClientServerAddress -InterfaceAlias ethernet -ServerAddresses (Read-Host "Primary DNS")</pre>
+<p style="text-align: justify;">&nbsp;Вот так выглядят сетевые настройки для моего тестового котроллера домена:</p>
+<p style="text-align: justify;"><img height="470" width="1024" alt="dc2.png" src="1665513729460.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Устанавливаем <span style="color: #ff0000;"><strong>роль</strong></span> AD DS:</p>
+<pre>Add-WindowsFeature AD-Domain-Services</pre>
+<p><img height="183" width="1024" alt="dc3.png" src="1665513729462.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;И&nbsp;устанавливаем первый контроллер домена в новом лесу. Необходимо вручную ввести <span style="color: #ff0000;"><strong>полное имя домена</strong></span>, <span style="color: #ff0000;"><strong>NetBIOS</strong></span> имя домена. А так же&nbsp;будет запрос на <span style="color: #ff0000;"><strong>пароль</strong></span> для Администратора, который будет использоваться при восстановлении AD (<span style="color: #ff0000;"><strong>DSRM</strong></span>). Других настроек (SYSVOL и т.п.)&nbsp;я не задаю, так как я не планирую менять их значения по умолчанию. Уровень леcа и домена по умолчанию - 2016.</p>
+<pre>Install-ADDSForest -DomainName (Read-Host "Domain Name") -DomainNetbiosName (Read-Host "NetBios Name") -InstallDns:$true -CreateDnsDelegation:$false</pre>
+<p><img height="639" width="1024" alt="dc4.png" src="1665513729464.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><em><strong>Необязательно</strong></em>:&nbsp;после перезагрузки создаю нового пользователя, и даю ему права администратора домена:</p>
+<pre>New-ADUser -name (Read-Host "User Name") -displayname (Read-Host "Display Name") -AccountPassword (Read-Host -AsSecureString "AccountPassword") -Enabled:$true<br><br>Add-ADGroupMember -Identity "Domain Admins" -Members (Read-Host "Domain administrator Name")</pre>
+<p><img height="182" width="1024" alt="dc5.png" src="1665513729466.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Выходим из сессии CORP\Administrator, и входим под учётной записью, созданной в предыдущем шаге.</p>
+<p><img height="368" width="1024" alt="dc6.png" src="1665513729468.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Блокируем учётную запись Administrator <span style="color: #ff0000;"><strong>если <span style="color: #000000;">была создана отдельная учётная запись доменного администратора</span></strong></span>:</p>
+<pre>Disable-ADAccount -Identity Administrator</pre>
+<p><img height="82" width="1024" alt="dc7.png" src="1665513729470.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Далее задаём сеть (<span style="color: #ff0000;"><strong>сеть репликации</strong></span>), которую будет обслуживать наш домен. Эта же сеть задаётся в оснастке&nbsp;"Сайты и службы":</p>
+<pre style="margin: 0px 0px 10px; padding: 9.5px; border-radius: 4px; border: 1px solid #cccccc; color: #333333; text-transform: none; line-height: 1.4285; text-indent: 0px; letter-spacing: normal; overflow: auto; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 13px; font-style: normal; font-weight: normal; word-spacing: 0px; display: block; -ms-word-break: break-all; -ms-word-wrap: break-word; box-sizing: border-box; orphans: 2; widows: 2; background-color: #f5f5f5; font-variant-ligatures: normal; font-variant-caps: normal; -webkit-text-stroke-width: 0px;">New-ADReplicationSubnet (Read-Host "Your Network") -Site default-first-site-name</pre>
+<p><img height="305" width="1024" alt="dc8.png" src="1665513729472.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Задаём новые значения для DNS серверов согласно <a target="_blank" rel="noopener noreferrer" href="https://technet.microsoft.com/en-us/library/ff807362%28v=ws.10%29.aspx">рекомендации Microsoft</a>&nbsp;- <span style="color: #ff0000;"><strong>первый адрес сам на себя</strong></span>, <span style="color: #ff00ff;"><strong>второй адрес - "петля" 127.0.0.1</strong></span>&nbsp;(для 2016 пока нет по этому информации, но судя по тому, что и&nbsp;для 2012 это было применено позже, то стоит ожидать применения этой статьи&nbsp;и для 2016):</p>
+<pre>Set-DnsClientServerAddress -InterfaceAlias ethernet -ServerAddresses ((Read-Host "Primary DNS"),(Read-Host "Secondary DNS"))</pre>
+<p><img height="612" width="1024" alt="dc12.png" src="1665513729474.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;И на последок создадим <span style="color: #ff0000;"><strong>обратную зону в DNS</strong> </span>для нашей сети:</p>
+<pre>Add-DnsServerPrimaryZone -NetworkID (Read-Host "Your Network") -ReplicationScope "Forest"</pre>
+<p><img height="91" width="1024" alt="dc9.png" src="1665513729476.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;После контрольной перезагрузки контроллер домена готов к работе!</p>
+<p><img height="89" width="1024" alt="dc11.png" src="1665513729478.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: right;"><em>25.10.2016</em></p>
+<div id="vk_comments">&nbsp;</div>

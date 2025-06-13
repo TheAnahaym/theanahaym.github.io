@@ -1,0 +1,48 @@
+<p style="text-align: center;"><span style="font-size: 14pt;"><strong>Дополнительный контроллер домена 2012 R2. Сайты</strong></span>&nbsp;</p>
+<p style="text-align: justify;">Используется следующая схема с главным офисом в Берлине и филиалом в Дрездене. Сети соединены с помощью OpenVPN site-to-site, реализованном на PFSense 2.1. Пропускная способность стабильного интернет канала для VPN 2 Мбит\сек в обе стороны.</p>
+<p style="text-align: justify;"><img height="172" width="562" alt="site0.png" src="1665513729504.png" style="display: block; margin-left: auto; margin-right: auto;">&nbsp;Прежде чем добавлять новый сервер в домен и устанавливать на нём роль AD DS необходимо создать новый сайт (<em>только для филиалов, в пределах одной локальной сети сайт создавать не нужно!</em>) и определить сеть для него. <a target="_blank" rel="noopener" href="http://technet.microsoft.com/en-us/library/cc758098%28v=ws.10%29.aspx#sectionSection115">Сайт (site)</a>&nbsp;- одна или несколько сетей TCP\IP имеющих высокоскоростное соединение. Как правило, сайты являются географически распределёнными. При наличии современных подключений к интернету, например <a target="_blank" rel="noopener" href="http://ru.wikipedia.org/wiki/Fiber_to_the_x">FTTX</a>, и небольших объёмах репликации необходимость нескольких сайтов может не понадобиться. Новый сайт создаётся в оснастке AD Sites and Services (сайты и службы):</p>
+<p><img height="807" width="1040" alt="site1.png" src="1665513729506.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;После создания сайта в той же оснастке AD SS необходимо определить IP сеть для сайта. В любой момент можно поменять принадлежность сети к сайту.</p>
+<p><img height="807" width="1040" alt="site2.png" src="1665513729508.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;После создания сайта автоматически создаётся связь сайтов (Site link), в которой можно менять членство сайтов, стоимость связи, интервал репликации и другие свойства:</p>
+<p><img height="807" width="1040" alt="site3.png" src="1665513729510.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Сетевые настройки нового сервера в филиале со статическим адресом:</p>
+<p><img height="768" width="1024" alt="site4.png" src="1665513729512.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Проверка разрешения имени сервера в главном офисе и его доступность (Firewall должен разрешать ICMP). Так как у нового сервера не назначен DNS-суффикс, то разрешение имени сервера по его NetBios имени было неуспешным. Необходимо проверять полное имя сервера - FQDN.&nbsp;Так же с помощью трассировки можно убедиться, что соединение идёт через VPN:</p>
+<p><img height="768" width="1024" alt="site5.png" src="1665513729514.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Вводим компьютер в домен:</p>
+<p><img height="768" width="1024" alt="site6.png" src="1665513729516.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;Проверяем, что учётная запись компьютера появилась в AD UC:</p>
+<p><img height="807" width="1040" alt="site7.png" src="1665513729518.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;После перезагрузки и входа в систему под доменной учётной записью, проверяем сервер авторизации (сервер в Берлине):</p>
+<p><img height="169" width="1024" alt="site9.png" src="1665513729520.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Устанавливаем роль AD DS:</p>
+<p><img height="768" width="1024" alt="site8.png" src="1665513729522.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;В отличие от установки <a target="_blank" rel="noopener" href="http://exonix.ru/#!Статьи.Windows_Server.Active_Directory.Контроллер_домена_2012_R2">первого контроллера домена</a>, необходимо выбрать "<em>добавить контроллер домена в существующий домен</em>":</p>
+<p><img height="768" width="1024" alt="site10.png" src="1665513729524.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Выбираем сайт, в котором расположен новый контроллер домена (в локальной сети будет один сайт, выбирать будет нечего):</p>
+<p><img height="768" width="1024" alt="site11.png" src="1665513729526.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Можно выбрать источник репликации. Если интернет канал совсем уж медленный, а база данных AD большая - можно установить с предворительного подготовленного носителя (например CD), который можно отправить по почте, а лучше по другой наиболее безопасной связи.</p>
+<p><img height="768" width="1024" alt="site12.png" src="1665513729528.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Во время установки я решил понаблюдать за нагрузкой интернет канала - 3-4 скачка до 2 Мбит\сек в течении 3-4 секунд. Тестовая доменная инфраструктура чистая. База данных AD всего несколько MB.</p>
+<p><img height="357" width="803" alt="site13.png" src="1665513729530.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;После установки роли AD DS и её настройки и перезагрузки сервера, проверяем сервер авторизации. Теперь это новый контроллер домена в Дрездене. При этом, что первичный DNS сервер указан берлинский:</p>
+<p><img height="169" width="1024" alt="site14.png" src="1665513729532.png" style="display: block; margin-left: auto; margin-right: auto;">&nbsp;Добавляем в ДНС самого себя и устанавливаем на первое место:</p>
+<p><img height="768" width="1024" alt="site15.png" src="1665513729534.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>&nbsp;После установки AD DS в новом сайте ещё не созданы настройки репликации для нового сервера:</p>
+<p><img height="807" width="1040" alt="site16.png" src="1665513729538.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Выбираем автоматически созданное соединение репликации у первого DC и выбираем "Реплицировать сейчас". На этом настройка дополнительного контроллера домена в филиале с отдельным сайтом <strong>завершена</strong>. Повторю: если установка проводится в одном офисе, в одной локальной сети, то создавать отдельный сайт нет необходимости.</p>
+<p><img height="807" width="1040" alt="site17.png" src="1665513729540.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Подключения для репликации между сайтами значительно отличаются от подключений внутри одного сайта. Хотя их можно так же настроить как и для внутрисайтовых репликаций. Репликацию&nbsp;легко проверить: создайте в главном офисе учётную запись, и дождитесь её появления в филиале. По умолчанию интервал репликации между сайтами - три&nbsp;часа. Внутри сайта - практически мгновенно.</p>
+<p><img height="807" width="1040" alt="site18.png" src="1665513729542.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="807" width="1040" alt="site19.png" src="1665513729544.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Предположим, что офис в Дрездене переезжает в Берлин. В этом случае необходимо переместить второй контроллер домена в один сайт с первым контроллером домена и потом перенастроить подключения репликации.</p>
+<p><img height="768" width="1024" alt="site20.png" src="1665513729546.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Самый простой способ перенастроить <strong>подключения</strong> репкликации - это удалить их и создать в автоматическом режиме. Для этого необходимо войти на каждый сервер, удалить связи. Затем выбрать NTDS Settings сервера на который вошли - все задачи - <em>проверить топологию репликации</em>. Т.е. на втором сервере DRE-DC вырать именного его NTDS Settings, а заголинившись на первом контроллере BER-DC вырать его NTDS Settings.</p>
+<p><img height="768" width="1024" alt="site22.png" src="1665513729548.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;Проверить, на правильном ли сервере вы проверяете топологию сети можно просто: на неверном сервере меню во "Все задачи" будет выглядеть по другому (+2 меню репликации):</p>
+<p><img height="768" width="1024" alt="site23.png" src="1665513729550.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;">&nbsp;На этом всё. Перенос контроллера домена в один сайт <strong>завершён</strong>.</p>
+<p style="text-align: right;"><em>25.04.2014</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>

@@ -1,0 +1,36 @@
+<div>
+<ul data-jkit="[menu]" class="dropdown">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012_и_NAT">Контроллер домена 2012 и NAT</a>
+<ul class="sub_menu">
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2008_R2">Контроллер домена 2008 R2</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012">Контроллер домена 2012</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Обновление_Active_Directory_2008R2_до_2012">Обновление Active Directory 2008R2 до 2012&nbsp;</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Резервное_копирование_Active_Directory_2012">Резервное копирование Active Directory 2012&nbsp;</a></li>
+<li><a href="#!Статьи.Windows_Server_Services.Active_Directory.Доверительные_отношения_между_2008_R2_и_2012">Доверительные отношения между 2008 R2 и 2012</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align: justify;">&nbsp;В последнее время всё чаще на форумах стали появляться вопросы об организации маршрутизатора на контроллере домена или решения сложностей в работе контроллера домена с несколькими сетевыми интерфейсами. В своих статьях я уже обращал внимание на рекомендации Microsoft для настройки таких контроллеров домена. В данной статье я подробнее опишу настройку и контроллера домена и маршрутизатора, который будет настроен в режиме NAT с помощью RRAS. Если предоставление доступа к интернету осуществляется другими приложениями, то алгоритм по настройке идентичный. Аналогичная настройка производится и в операционной системе Windows Server 2012 <strong>R2</strong>. Исходные данные:</p>
+<p>&nbsp;- виртуальный сервер под управлением Windows Server 2012 SE. CPU i7-2600, RAM 2 GB, две сетевые карты<br>&nbsp;- виртуальный клиент под управлением Windows 8 EE. <span>CPU i7-2600, RAM 2 GB</span></p>
+<p>&nbsp;Настройки сетевых интерфейсов сервера и настройка внешнего сетевого интерфейса <strong>WAN</strong> для работы в домене.</p>
+<p><img height="768" width="1024" alt="adnat1.png" src="1665513729482.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img alt="" src="http://fs.exonix.ru/2012/adnat2.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><img height="768" width="1024" alt="adnat4.png" src="1665513729484.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;"><span>&nbsp;Установка и настройка NAT, используя роль Remote Access описана в <a target="_blank" rel="noopener" href="http://exonix.ru/#!Статьи.Сети.Маршрутизатор_2012_R2">данной статье</a>.</span>&nbsp;Устанавливаем&nbsp;<a href="http://zamet.co/exonix/#!Статьи.Windows_Server_Services.Active_Directory.Контроллер_домена_2012">роль контроллера домена</a>. Кроме стандартных настроек (сеть в сайте, обратная зона ДНС, порядок ДНС в сетевой карте) <span style="color: #ff0000;"><strong>необходимо отключить принимать запросы с внешнего интерфейса.</strong></span>&nbsp;Для IPv6 тоже. Именно эта настройка влияет на работу служб Active Directory, и мультисетях внешние сетевые интерфейсы должны быть исключены!</p>
+<p><img height="768" width="1024" alt="adnat14.png" src="1665513729486.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p><span>Если вы сделали всё правильно, то в ДНС в прямой зоне (везде, где выделено красным) будут следующие записи и больше никаких. <span>После любых перезагрузок сервера мы будем получать стандартное сообщение от ДНС сервера под номером 4013.</span></span></p>
+<p><img height="768" width="1024" alt="adnat15.png" src="1665513729488.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Проверим трассировку до exonix.ru - всё работает. Второй узел не ответил, т.к. это внешний адрес NAT. Об этом я напишу ниже.</p>
+<p><img height="234" width="993" alt="adnat16.png" src="1665513729492.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: justify;"><span>&nbsp;Что будет если включить регистрацию сетевого интерфейса в ДНС и разрешить отвечать на запросы с внешнего интерфейса? Тогда в ДНС появятся лишние записи, из-за которых и случаются сбои, решаемые на форумах. А так как эта запись является внешним адресом NAT, то ни один клиент из внутренней сети никогда не получит доступ к нему (некоторые специально настроенные Linux-маршрутизаторы позволяют это сделать). Это подобено попытке открыть дверь с внешней стороны, находясь внутри комнаты. <span>По этому компьютеры теряют связь с доменом, так обращаются на недоступный адрес контроллера домена. </span>Для решения неприятных ситуаций с AD <strong><a target="_blank" rel="noopener" href="http://support.microsoft.com/kb/272294/ru">Microsoft рекомендует</a></strong> отключить регистрацию внешнего интерфейса в ДНС и удалить лишние А записи в ДНС зоне. <span>Если у вас несколько контроллеров домена помимо установленного с RRAS, то ещё рекомендуется отключить Round-robin для ДНС.</span></span></p>
+<p><span><span><img height="768" width="1024" alt="adnat17.png" src="1665513729496.png" style="display: block; margin-left: auto; margin-right: auto;"></span></span></p>
+<p style="text-align: justify;"><span>&nbsp;В рекомендации ни слова о ДНС настройках в свойствах внешнего сетевого интерфейса. По этой причине лично <em><strong>я</strong></em> оставляю там ДНС провайдера, <em><strong>как и в любом маршрутизаторе</strong></em>. Например <a target="_blank" rel="noopener" href="http://www.dlink.ru/up/uploads_img/5/Routers/Setting_Static_IP_DIR-400_02.jpg">Dlink Dir-400</a>, <a target="_blank" rel="noopener" href="http://zyxel.ru/sites/default/files/images/keen07.jpg">Zyxel Keenetic</a>, <a target="_blank" rel="noopener" href="http://fs.exonix.ru/network/DNS-cisco1.png">Cisco 7204</a>. Список можно продолжать - это стандарт для маршрутизаторов. <em>Правда для Cisco здесь не указывается интерфейс</em>.</span></p>
+<p>А теперь попытаемся ввести клиентскую машину в наш домен. Так как в нашей тестовой среде нет DHCP сервера, и DNS-суффикс не определён, то необходимо ввести полное имя домена:</p>
+<p><img height="768" width="1024" alt="adnat18.png" src="1665513729498.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p style="text-align: center;"><img alt="" src="http://fs.exonix.ru/2012/adnat19.png"></p>
+<p style="text-align: right;"><em>26.06.2013</em></p>
+<p style="text-align: justify;">&nbsp;</p>
+<div id="vk_comments"></div>
